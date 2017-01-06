@@ -13,6 +13,12 @@
   Account = require('../models/account');
 
   BinaryFile = require('../models/binary_file');
+  // var redis = require('redis');
+  // var client = redis.createClient();
+
+  // client.on('error', function (err) {
+  //   console.log("Error " + err);
+  // });
 
   mongoose = require('mongoose')
   var Schema   = mongoose.Schema;
@@ -84,10 +90,52 @@
     });
   });
 
-  router.get('/binary', function(req, res) {
-    return BinaryFile.first;
-  });
+  // saves file on server side
+  execBinary = function(req,res){
+    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
+      if(err)
+        return res.render(err);
+      else
+        wstream = fs.createWriteStream('myoutput1', { encoding: 'binary' });
+        wstream.on('data', (chunk) => {
+          console.log(`Received ${chunk.length} bytes of data.`);
+        });
+        console.log('attempting to write file');
+        wstream.write(new Buffer(data.binary), function(err){
+          if(err){
+            throw err;
+          }
+          console.log('file written!')
+        });
+        wstream.end();
+        return
+    });
+  }
+  // sends file to client
+  clientBinary = function(req,res){
+    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
+      if(err)
+        return res.render(err);
+      else
+        res.setHeader('Content-Description','File Transfer');
+        res.setHeader('Content-Disposition', 'attachment; filename=binary');
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.end(data.binary);
+        return
+    });
+  }
+  router.get('/binary', clientBinary);
 
+  router.get('redis', function(req, res){
+    client
+    server.open(function(err){
+      if(err == null){
+        // do some stuff
+        return res.render('connected')
+      }
+    })
+  });
+  
   router.get('/upload', function(req, res) {
     return res.render('upload');
   });
@@ -148,25 +196,21 @@
       .on('end', function(){
         console.log('-> upload done');
         console.log(mongoose.connection.readyState);
-        mongoose.set('debug', true);
+        mongoose.set('debug', false);
 
-        console.log('removed old docs')
         b = new BinaryFile;
         b._id = new ObjectId();
         
         b.binary = files[0][1];
-        b.username_1 = 1;
-        console.log(req.session.passport.user)
+        console.log(req.session.passport.user) //undefined
         return b.save(function(err) {
           if (err) {
             debugger;
             return console.error('b failed: ' + err.errmsg);
           }
-          console.log('buffer saved');
           res.writeHead(200, {'content-type': 'text/plain'});
-          res.write('received fields:\n\n '+util.inspect(fields));
           res.write('\n\n');
-          res.end('file received:\n\n '+util.inspect(files));
+          res.end('file received:\n\n ');
         });
       });
       form.parse(req);

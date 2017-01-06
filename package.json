@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "nodemon --debug ./bin/server.js",
+    "mongo_start": "mongod --config /usr/local/etc/mongod.conf",
     "test": "make test"
   },
   "repository": {
