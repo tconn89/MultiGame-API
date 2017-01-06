@@ -205,7 +205,6 @@
         console.log(req.session.passport.user) //undefined
         return b.save(function(err) {
           if (err) {
-            debugger;
             return console.error('b failed: ' + err.errmsg);
           }
           res.writeHead(200, {'content-type': 'text/plain'});
