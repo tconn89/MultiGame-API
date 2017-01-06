@@ -61,6 +61,7 @@
     });
   });
 
+  // why does this work?
   router.get('/login', function(req, res) {
     return res.render('login', {
       user: req.user,
@@ -113,19 +114,29 @@
   }
   // sends file to client
   clientBinary = function(req,res){
-    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
-      if(err)
-        return res.render(err);
-      else
-        res.setHeader('Content-Description','File Transfer');
-        res.setHeader('Content-Disposition', 'attachment; filename=binary');
-        res.setHeader('Content-Type', 'application/octet-stream');
-        res.end(data.binary);
-        return
-    });
+    if(req.user)
+      BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
+        if(err)
+          return res.render(err);
+        else
+          res.setHeader('Content-Description','File Transfer');
+          res.setHeader('Content-Disposition', 'attachment; filename=binary');
+          res.setHeader('Content-Type', 'application/octet-stream');
+          res.end(data.binary);
+          return
+      });
+    else
+      return res.status('401').send('you must sign in first');
   }
-  router.get('/binary', clientBinary);
+  router.get('/binary',
+    clientBinary
+  );
 
+  router.get('/', function(req, res) {
+    return res.render('index', {
+      user: req.user
+    });
+  });
   router.get('redis', function(req, res){
     client
     server.open(function(err){
