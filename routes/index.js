@@ -13,12 +13,6 @@
   Account = require('../models/account');
 
   BinaryFile = require('../models/binary_file');
-  // var redis = require('redis');
-  // var client = redis.createClient();
-
-  // client.on('error', function (err) {
-  //   console.log("Error " + err);
-  // });
 
   mongoose = require('mongoose')
   var Schema   = mongoose.Schema;
@@ -41,9 +35,65 @@
     return res.render('register', {});
   });
 
+  getIncrementedId = function(){
+    return Account.findOne().sort({created_at: -1}).exec(function(err, account) {
+      if(err){
+        console.log(err);
+        return 1;
+      }
+      if(account){
+        if(account.id)
+          return 1 + account.id;
+      }
+      else
+        return 1;
+    });
+  }
+  router.get('/drop', function(req,res){
+    mongoose.connection.db.dropCollection('accounts', function(err, result) {
+      if(err)
+        return console.log(err);
+      res.send('deleted');
+    });
+
+  });
+
+  function dropCollection (modelName) {
+    if (!modelName || !modelName.length) {
+      Promise.reject(new Error('You must provide the name of a model.'));
+    }
+
+    try {
+      var model = mongoose.model(modelName);
+      var collection = mongoose.connection.collections[model.collection.collectionName];
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    return new Promise(function (resolve, reject) {
+      collection.drop(function (err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        // Remove mongoose's internal records of this
+        // temp. model and the schema associated with it
+        delete mongoose.models[modelName];
+        delete mongoose.modelSchemas[modelName];
+      
+        resolve();
+      });
+    });
+  }
+  router.get('/real_drop', function(req,res){
+    dropCollection('accounts');
+    res.send('good to go');
+  });
   router.post('/register', function(req, res, next) {
     return Account.register(new Account({
-      username: req.body.username
+      username: req.body.username,
+      created_at: new Date
     }), req.body.password, function(err, account) {
       if (err) {
         return res.render('register', {
@@ -122,7 +172,7 @@
           res.setHeader('Content-Description','File Transfer');
           res.setHeader('Content-Disposition', 'attachment; filename=binary');
           res.setHeader('Content-Type', 'application/octet-stream');
-          res.end(data.binary);
+          res.status('200').end(data.binary);
           return
       });
     else
@@ -186,6 +236,15 @@
 
   router.post('/upload', function(req, res) {
 
+    if(!req.user){
+      console.error('you must be a user');
+      return res.status('401').send('you must be a user');
+    }
+
+    // body parser, param sent from POSTman
+    var token = req.body.token;
+    console.log(token);
+
     var form;
     form = new formidable.IncomingForm({noFileSystem: true}),
       files = [],
@@ -206,14 +265,16 @@
       })
       .on('end', function(){
         console.log('-> upload done');
-        console.log(mongoose.connection.readyState);
         mongoose.set('debug', false);
 
         b = new BinaryFile;
         b._id = new ObjectId();
+        b.user_id = req.user.id;
+        b.created_at = new Date();
+        if(req.body.map_id)
+          b.map_id = req.body.map_id
         
         b.binary = files[0][1];
-        console.log(req.session.passport.user) //undefined
         return b.save(function(err) {
           if (err) {
             return console.error('b failed: ' + err.errmsg);
