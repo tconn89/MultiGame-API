@@ -26,8 +26,6 @@
 
   users = require('./routes/users');
 
-  var responseTime = require('response-time');
-  var axios = require('axios');
   
 
   app = express();
@@ -36,7 +34,6 @@
 
   app.set('view engine', 'jade');
 
-  app.use(responseTime());
 
   app.use(favicon(__dirname + '/public/favicon.ico'));
 

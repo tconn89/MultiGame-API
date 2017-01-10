@@ -164,19 +164,17 @@
   }
   // sends file to client
   clientBinary = function(req,res){
-    if(req.user)
-      BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
-        if(err)
-          return res.render(err);
-        else
-          res.setHeader('Content-Description','File Transfer');
-          res.setHeader('Content-Disposition', 'attachment; filename=binary');
-          res.setHeader('Content-Type', 'application/octet-stream');
-          res.status('200').end(data.binary);
-          return
-      });
-    else
-      return res.status('401').send('you must sign in first');
+    // if(!req.user)
+    // return res.status('401').send('you must sign in first');
+    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
+      if(err)
+        return res.render(err);
+      else
+        res.setHeader('Content-Description','File Transfer');
+        res.setHeader('Content-Disposition', 'attachment; filename=binary');
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.status('200').end(data.binary);
+    });
   }
   router.get('/binary',
     clientBinary
@@ -236,10 +234,10 @@
 
   router.post('/upload', function(req, res) {
 
-    if(!req.user){
-      console.error('you must be a user');
-      return res.status('401').send('you must be a user');
-    }
+    // if(!req.user){
+    //   console.error('you must be a user');
+    //   return res.status('401').send('you must be a user');
+    // }
 
     // body parser, param sent from POSTman
     var token = req.body.token;
