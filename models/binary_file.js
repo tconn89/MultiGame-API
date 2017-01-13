@@ -9,8 +9,8 @@
   passportLocalMongoose = require('passport-local-mongoose');
 
   BinaryFile = new Schema({
-    binary: Buffer,
-    key: String,
+    path: String,
+    map_name: String,
     user_id: Number,
     created_at: Date
   });

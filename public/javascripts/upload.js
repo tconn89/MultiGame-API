@@ -23,7 +23,7 @@ $('#upload-input').on('change', function(){
       formData.append('uploads[]', file, file.name);
     }
     $.ajax({
-      url: '/upload',
+      url: '/upload?map_name=bricks',
       type: 'POST',
       data: formData,
       processData: false,

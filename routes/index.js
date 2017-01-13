@@ -23,6 +23,8 @@
 
   path = require('path');
 
+  var mime = require('mime');
+
   router = express.Router();
 
   router.get('/', function(req, res) {
@@ -166,14 +168,26 @@
   clientBinary = function(req,res){
     // if(!req.user)
     // return res.status('401').send('you must sign in first');
-    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
+    var filename;
+    var params;
+    if(req.query.map_name){
+      params = {'map_name': req.query.map_name };
+    }
+    else {
+      params = {'_id': ObjectId("58759753e2d72ed5d3bf2bbb") };
+      filename = 'binary';
+    }
+    BinaryFile.findOne(params, function(err, data){
       if(err)
         return res.render(err);
       else
+        mimetype = mime.lookup(data.path);
+        console.log(mimetype);
+        filename = data.path.split('/').pop();
         res.setHeader('Content-Description','File Transfer');
-        res.setHeader('Content-Disposition', 'attachment; filename=binary');
-        res.setHeader('Content-Type', 'application/octet-stream');
-        res.status('200').end(data.binary);
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.setHeader('Content-Type', mimetype);
+        res.status('200').end(fs.readFileSync(data.path));
     });
   }
   router.get('/binary',
@@ -195,6 +209,21 @@
     })
   });
   
+  router.get('/sizes', function(req, res){
+    BinaryFile.find({}, function(err, binary_refs){
+      if(err){
+        throw err;
+      }
+      sizes = [];
+      binary_refs.forEach(function(binary_ref){
+        file = fs.statSync(binary_ref.path);
+        size = file.size/1000.0;
+        console.log(`Map ${binary_ref.map_name} has size: ${size} kilobytes`);
+        sizes.push(file.size);
+      });
+      res.status(200).send('All Done');
+    })
+  });
   router.get('/upload', function(req, res) {
     return res.render('upload');
   });
@@ -232,19 +261,31 @@
     return res.status(200).send('finished');
   });
 
+  router.get('/remove_binary', function(req, res){
+    BinaryFile.remove({}, function(err){
+      if(err){
+        console.error(err);
+      }
+      res.status(200).send('All removed');
+    });
+  });
+
   router.post('/upload', function(req, res) {
 
+    // user authorization
     // if(!req.user){
     //   console.error('you must be a user');
     //   return res.status('401').send('you must be a user');
     // }
 
-    // body parser, param sent from POSTman
-    var token = req.body.token;
-    console.log(token);
+    configuredForm(req,res,false);
+    //configuredForm(req,res,true);
+  });
 
+  configuredForm = function(req,res, binaryFlag){
+    map_name = req.query.map_name;
     var form;
-    form = new formidable.IncomingForm({noFileSystem: true}),
+    form = new formidable.IncomingForm({noFileSystem: binaryFlag}),
       files = [],
       fields = []; 
     form.multiples = true;
@@ -257,33 +298,39 @@
       .on('file', function(field, file) {
         console.log('on file');
         files.push([field,file]);
+        file_path = path.join(form.uploadDir, file.name);
+        fs.rename(file.path, file_path);
+        addBinary(file, map_name, file_path);
       })
       .on('error', function(err) {
         return console.log('An error has occured: \n' + err);
       })
       .on('end', function(){
         console.log('-> upload done');
-        mongoose.set('debug', false);
-
-        b = new BinaryFile;
-        b._id = new ObjectId();
-        b.user_id = req.user.id;
-        b.created_at = new Date();
-        if(req.body.map_id)
-          b.map_id = req.body.map_id
-        
-        b.binary = files[0][1];
-        return b.save(function(err) {
-          if (err) {
-            return console.error('b failed: ' + err.errmsg);
-          }
-          res.writeHead(200, {'content-type': 'text/plain'});
-          res.write('\n\n');
-          res.end('file received:\n\n ');
-        });
       });
-      form.parse(req);
-  });
+    form.parse(req, function(err, fields, files) {
+      if(err)
+        console.log(err);
+      res.writeHead(200, {'content-type': 'text/plain'});
+      res.write('received upload:\n\n');
+      res.end(util.inspect({fields: fields, files: files}));
+    });
+  }
+
+  addBinary = function(file, map_name, path){
+    b = new BinaryFile;
+    b._id = new ObjectId();
+    b.path = file_path;
+    //b.user_id = req.user.id;
+    b.created_at = new Date();
+    if(map_name)
+      b.map_name = map_name;
+    return b.save(function(err) {
+      if (err) {
+        return console.error('b failed: ' + err);
+      }
+    });
+  }
   module.exports = router;
 
 }).call(this);
