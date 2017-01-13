@@ -170,6 +170,7 @@
     // return res.status('401').send('you must sign in first');
     var filename;
     var params;
+    console.log(req.query.map_name);
     if(req.query.map_name){
       params = {'map_name': req.query.map_name };
     }
