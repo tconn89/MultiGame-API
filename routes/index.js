@@ -94,7 +94,17 @@
     dropCollection('accounts');
     res.send('good to go');
   });
+
   router.post('/register', function(req, res, next) {
+    username = req.body.username;
+    password = req.body.password;
+    console.log(`user: ${username}`);
+    console.log(`pass: ${password}`);
+    if(!username || !password){
+      req.session.destroy();
+      //res.clearCookie('connect.sid');
+      return res.status(400).send('missing field data').end();
+    }
     return Account.register(new Account({
       username: req.body.username,
       created_at: new Date
@@ -309,7 +319,10 @@
   });
 
   configuredForm = function(req,res, binaryFlag){
-    map_name = req.query.map_name;
+    map_name = req.headers.map_name;
+    if(!map_name)
+      return res.status(400).send('Need a map name').end();
+
     var form;
     form = new formidable.IncomingForm({noFileSystem: binaryFlag}),
       files = [],
@@ -324,7 +337,7 @@
       .on('file', function(field, file) {
         console.log('on file');
         files.push([field,file]);
-        file_path = path.join(form.uploadDir, file.name);
+        file_path = path.join(form.uploadDir, map_name);
         fs.rename(file.path, file_path);
         addBinary(file, map_name, file_path);
       })
@@ -344,17 +357,27 @@
   }
 
   addBinary = function(file, map_name, path){
-    b = new BinaryFile;
-    b._id = new ObjectId();
-    b.path = file_path;
-    //b.user_id = req.user.id;
-    b.created_at = new Date();
-    if(map_name)
-      b.map_name = map_name;
-    return b.save(function(err) {
-      if (err) {
-        return console.error('b failed: ' + err);
+    BinaryFile.findOne({map_name:map_name}, function(err,doc){
+      if(err){
+        throw err;
       }
+      if(doc)
+        b = doc;
+      else{
+        b = new BinaryFile;
+        b._id = new ObjectId();
+        b.path = file_path;
+        b.created_at = new Date();
+      }
+
+      b.updated_at = new Date();
+      //b.user_id = req.user.id;
+      b.map_name = map_name;
+      return b.save(function(err) {
+        if (err) {
+          return console.error('b failed: ' + err);
+        }
+      });
     });
   }
   module.exports = router;
