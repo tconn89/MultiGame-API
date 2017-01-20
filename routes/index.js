@@ -216,6 +216,8 @@
       if(err)
         return res.render(err);
       else
+        if(!data)
+          return res.status(400).send(`No maps by name: ${map_name}`);
         mimetype = mime.lookup(data.path);
         console.log(mimetype);
         filename = data.path.split('/').pop();
