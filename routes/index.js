@@ -205,14 +205,13 @@
     // return res.status('401').send('you must sign in first');
     var filename;
     var params;
-    console.log(req.query.map_name);
+    var map_name = req.headers.map_name;
     if(req.query.map_name){
-      params = {'map_name': req.query.map_name };
+      map_name = req.query.map_name;
     }
-    else {
-      params = {'_id': ObjectId("58759753e2d72ed5d3bf2bbb") };
-      filename = 'binary';
-    }
+    params = {'map_name': map_name };
+    filename = 'binary';
+    console.log(`map_name: ${map_name}`);
     BinaryFile.findOne(params, function(err, data){
       if(err)
         return res.render(err);
@@ -264,6 +263,24 @@
     return res.render('upload');
   });
 
+  router.get('/maps_index', function(req, res){
+    BinaryFile.find({}, function(err, docs){
+      if(err){
+        throw err;
+      }
+      names = [];
+      i = 0;
+      docs.forEach(function(ref){
+        if(ref.map_name)
+          names.push(ref.map_name);
+      });
+      maps = {
+        'maps': names
+      }
+      maps_json = JSON.stringify(maps);
+      res.status(200).send(maps_json).end();
+    });
+  });
   router.get('/ping', function(req, res) {
     var file, http, request;
     console.log(__dirname);
@@ -319,7 +336,9 @@
   });
 
   configuredForm = function(req,res, binaryFlag){
-    map_name = req.headers.map_name;
+    var map_name = req.headers.map_name;
+    if(req.query.map_name)
+      map_name = req.query.map_name;
     if(!map_name)
       return res.status(400).send('Need a map name').end();
 
