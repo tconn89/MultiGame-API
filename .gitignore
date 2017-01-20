@@ -1,4 +1,6 @@
 /log/*.log
+/logs
+/log
 /tmp
 .DS_Store
 .idea/

@@ -14,6 +14,8 @@
 
   BinaryFile = require('../models/binary_file');
 
+  Session = require('../models/session');
+
   mongoose = require('mongoose')
   var Schema   = mongoose.Schema;
   var ObjectIdSchema = Schema.ObjectId;
@@ -103,6 +105,7 @@
         });
       }
       return passport.authenticate('local')(req, res, function() {
+        req.session.cookie.maxAge = 3600000;
         return req.session.save(function(err) {
           if (err) {
             return next(err);
@@ -125,6 +128,28 @@
     failureRedirect: '/login',
     failureFlash: true
   }), function(req, res, next) {
+    Session.findOne({secret: req.session.id}, function(err,doc){
+      if(err)
+        console.error(err);
+      if(doc)
+        console.log(`user_id: ${doc.user_id}`);
+      else{
+        session = new Session;
+        session.secret = req.session.id;
+        session.path = req.session.cookie.path;
+        Account.findOne({username: req.user.username},function(err,doc){
+          if(err)
+            console.error(err);
+          console.log(`user: ${doc.id}`);
+          session.user_id = doc.id;
+          session.save(function(err){
+            if(err)
+              console.error(err);
+          });
+        });
+      }
+    });
+    req.session.cookie.maxAge = 3600000;
     return req.session.save(function(err) {
       if (err) {
         return next(err);

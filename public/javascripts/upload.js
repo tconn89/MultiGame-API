@@ -23,12 +23,13 @@ $('#upload-input').on('change', function(){
       formData.append('uploads[]', file, file.name);
     }
     $.ajax({
-      url: '/upload?map_name=bricks',
+      url: '/upload?map_name=test',
       type: 'POST',
       data: formData,
       processData: false,
       contentType: false,
       success: function(data){
+          console.log(data);
           console.log('upload successful!');
       },
       xhr: function() {

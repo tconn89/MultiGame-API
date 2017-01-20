@@ -26,6 +26,8 @@
 
   users = require('./routes/users');
 
+  fs = require('fs');
+
   
 
   app = express();
@@ -77,6 +79,15 @@
 
   mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
+  // mongoose.set('debug', function (collectionName, method, query, doc) {
+
+  //   log = `${method} requested ${query.model}.${query.field}`
+  //   fs.appendFile(__dirname + '/logs/mongo.log', log, function(err){
+  //     if(err)
+  //       throw err;
+  //   });
+  // });
+  mongoose.set('debug', true);
   app.use(function(req, res, next) {
     var err;
     err = new Error('Not Found');
