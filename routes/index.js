@@ -55,6 +55,8 @@
       my_cookie = req.headers.authorization.split(',');
     else if(req.headers.my_cookie)
       my_cookie = req.headers.my_cookie.split(',');
+    else if(req.body.my_cookie)
+      my_cookie = req.body.my_cookie.split(',');
     else
       return res.status(401).send('no cookie data, you are not authorized')
 
@@ -226,32 +228,36 @@
   }
   // sends file to client
   clientBinary = function(req,res){
-    // if(!req.user)
-    // return res.status('401').send('you must sign in first');
-    var filename;
-    var params;
-    var map_name = req.headers.map_name;
-    if(req.query.map_name){
-      map_name = req.query.map_name;
-    }
-    params = {'map_name': map_name };
-    filename = 'binary';
-    console.log(`map_name: ${map_name}`);
-    BinaryFile.findOne(params, function(err, data){
+    local_authentication(req, res, function(err, probly_user){
       if(err)
-        return res.render(err);
-      else
-        if(!data)
-          return res.status(400).send(`No maps by name: ${map_name}`);
-        mimetype = mime.lookup(data.path);
-        console.log(mimetype);
-        filename = data.path.split('/').pop();
-        res.setHeader('Content-Description','File Transfer');
-        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-        res.setHeader('Content-Type', mimetype);
-        res.status('200').end(fs.readFileSync(data.path));
+        throw err;
+      // if(!req.user)
+      // return res.status('401').send('you must sign in first');
+      var filename;
+      var params;
+      var map_name = req.headers.map_name;
+      if(req.query.map_name){
+        map_name = req.query.map_name;
+      }
+      params = {'map_name': map_name };
+      filename = 'binary';
+      console.log(`map_name: ${map_name}`);
+      BinaryFile.findOne(params, function(err, data){
+        if(err)
+          return res.render(err);
+        else
+          if(!data)
+            return res.status(400).send(`No maps by name: ${map_name}`);
+          mimetype = mime.lookup(data.path);
+          console.log(mimetype);
+          filename = data.path.split('/').pop();
+          res.setHeader('Content-Description','File Transfer');
+          res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+          res.setHeader('Content-Type', mimetype);
+          res.status('200').end(fs.readFileSync(data.path));
+      });
     });
-  }
+  };
   router.get('/binary',
     clientBinary
   );
@@ -352,13 +358,17 @@
 
   router.post('/upload', function(req, res) {
 
+    local_authentication(req, res, function(err, probly_user){
+      if(err)
+        throw err;
     // user authorization
     // if(!req.user){
     //   console.error('you must be a user');
     //   return res.status('401').send('you must be a user');
     // }
 
-    configuredForm(req,res,false);
+      configuredForm(req,res,false);
+    });
     //configuredForm(req,res,true);
   });
 
