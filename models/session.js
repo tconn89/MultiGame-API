@@ -13,9 +13,23 @@
     user_id: Number,
     created_at: Date
   });
+  Session.methods.saveSesh = function(clientSecret, user, res){
+    session = this;
+    // client to 
+    session.secret = clientSecret;
+    //session.path = req.session.cookie.path;
+    session.user_id = user.id;
+    session.save(function(err){
+      if(err)
+        console.error(err);
+      return res.send({'session': clientSecret})
+    });
+  }
 
-  // BinaryFile.plugin(passportLocalMongoose);
+  
+  // Session.plugin(passportLocalMongoose);
 
   module.exports = mongoose.model('Session', Session);
+
 
 }).call(this);

@@ -30,8 +30,13 @@
   router = express.Router();
 
   router.get('/', function(req, res) {
-    return res.render('index', {
-      user: req.user
+    local_authentication(req, res, function(err, probly_user){
+      if(err)
+        throw err;
+      if(req.user == probly_user)
+        res.send('`${req.user.username} is doing great');
+      else
+        res.send(`${probly_user.username} just started a new session`);
     });
   });
 
@@ -39,6 +44,32 @@
     return res.render('register', {});
   });
 
+  local_authentication = function(req, res, callback){
+    if(!req.session)
+      return res.send('session undefined, you are not authorized')
+
+    var my_cookie;
+    if(req.headers.authorization)
+      my_cookie = req.headers.authorization.split(',');
+    else if(req.headers.my_cookie)
+      my_cookie = req.headers.my_cookie.split(',');
+    else
+      return res.status.send('no cookie data, you are not authorized')
+
+    Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
+      if(err)
+        throw err;
+      if(db_sesh)
+        Account.findOne({id: db_sesh.user_id}, function(err, user){
+          if(user)
+             callback(err, user);
+          else
+            res.status(401).send('anonymous session, you are not authorized')
+        });
+      else
+        res.status(401).send('no session on record, you are not authorized')
+    });
+  }
   getIncrementedId = function(){
     return Account.findOne().sort({created_at: -1}).exec(function(err, account) {
       if(err){
@@ -95,6 +126,16 @@
     res.send('good to go');
   });
 
+  router.get("/session", function(req, res){
+    session = req.session;
+    console.log(`Session Store: ${req.session.store}`);
+    console.log(`Cookie: ${Session.cookie}`);
+
+    session.store.get(req.sessionID, function(err, data) {
+      res.send({err: err, data:data});
+    });
+  });
+
   router.post('/register', function(req, res, next) {
     username = req.body.username;
     password = req.body.password;
@@ -110,21 +151,18 @@
       created_at: new Date
     }), req.body.password, function(err, account) {
       if (err) {
-        return res.render('register', {
-          error: err.message
-        });
+        return res.status(500).send(err.message);
       }
       return passport.authenticate('local')(req, res, function() {
         req.session.cookie.maxAge = 3600000;
-        return req.session.save(function(err) {
-          if (err) {
-            return next(err);
-          }
-          return res.send(`${req.user.username} is now logged in`);
-        });
+        // do not duplicate in db sessions
+        // need to be async      
+        session = new Session();
+        session.saveSesh(req.session.id, req.user, res);
       });
     });
   });
+
 
   // why does this work?
   router.get('/login', function(req, res) {
@@ -143,28 +181,12 @@
         console.error(err);
       if(doc)
         console.log(`user_id: ${doc.user_id}`);
+        // renew session
       else{
-        session = new Session;
-        session.secret = req.session.id;
-        session.path = req.session.cookie.path;
-        Account.findOne({username: req.user.username},function(err,doc){
-          if(err)
-            console.error(err);
-          console.log(`user: ${doc.id}`);
-          session.user_id = doc.id;
-          session.save(function(err){
-            if(err)
-              console.error(err);
-          });
-        });
+        session = new Session();
+        req.session.cookie.maxAge = 3600000;
+        return session.saveSesh(req.session.id, req.user, res);
       }
-    });
-    req.session.cookie.maxAge = 3600000;
-    return req.session.save(function(err) {
-      if (err) {
-        return next(err);
-      }
-      return res.send(`${req.user.username} is now logged in`);
     });
   });
 
