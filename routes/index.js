@@ -120,7 +120,7 @@
           if (err) {
             return next(err);
           }
-          return res.redirect('/');
+          return res.send(`${req.user.username} is now logged in`);
         });
       });
     });
@@ -164,7 +164,7 @@
       if (err) {
         return next(err);
       }
-      return res.redirect('/');
+      return res.send(`${req.user.username} is now logged in`);
     });
   });
 
