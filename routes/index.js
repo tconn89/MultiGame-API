@@ -16,7 +16,11 @@
 
   Session = require('../models/session');
 
-  mongoose = require('mongoose')
+  mongoose = require('mongoose');
+
+  MapController = require('../controllers/map_controller');
+  mapController = new MapController();
+
   var Schema   = mongoose.Schema;
   var ObjectIdSchema = Schema.ObjectId;
   var ObjectId = mongoose.Types.ObjectId;
@@ -30,14 +34,7 @@
   router = express.Router();
 
   router.get('/', function(req, res) {
-    local_authentication(req, res, function(err, probly_user){
-      if(err)
-        throw err;
-      if(req.user == probly_user)
-        res.send('`${req.user.username} is doing great');
-      else
-        res.send(`${probly_user.username} just started a new session`);
-    });
+    res.type('text/plain').send(`${req.user.username} just started a new session`);
   });
 
   router.get('/register', function(req, res) {
@@ -120,7 +117,7 @@
         // temp. model and the schema associated with it
         delete mongoose.models[modelName];
         delete mongoose.modelSchemas[modelName];
-      
+
         resolve();
       });
     });
@@ -160,7 +157,7 @@
       return passport.authenticate('local')(req, res, function() {
         req.session.cookie.maxAge = 3600000;
         // do not duplicate in db sessions
-        // need to be async      
+        // need to be async
         session = new Session();
         session.saveSesh(req.session.id, req.user, res);
       });
@@ -276,7 +273,7 @@
       }
     })
   });
-  
+
   router.get('/sizes', function(req, res){
     BinaryFile.find({}, function(err, binary_refs){
       if(err){
@@ -356,20 +353,8 @@
     });
   });
 
-  router.post('/upload', function(req, res) {
-
-    local_authentication(req, res, function(err, probly_user){
-      if(err)
-        throw err;
-    // user authorization
-    // if(!req.user){
-    //   console.error('you must be a user');
-    //   return res.status('401').send('you must be a user');
-    // }
-
-      configuredForm(req,res,false);
-    });
-    //configuredForm(req,res,true);
+  router.post('/upload', function(req, res){
+    mapController.upload(req, res);
   });
 
   configuredForm = function(req,res, binaryFlag){
@@ -382,7 +367,7 @@
     var form;
     form = new formidable.IncomingForm({noFileSystem: binaryFlag}),
       files = [],
-      fields = []; 
+      fields = [];
     form.multiples = true;
     form.uploadDir = path.join(__dirname, '/../public/uploads');
     form

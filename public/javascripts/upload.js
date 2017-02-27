@@ -23,11 +23,12 @@ $('#upload-input').on('change', function(){
       formData.append('uploads[]', file, file.name);
     }
     $.ajax({
-      url: '/upload?map_name=test',
+      url: '/upload?map_name=quality',
       type: 'POST',
       data: formData,
       processData: false,
       contentType: false,
+      beforeSend: function(xhr){xhr.setRequestHeader('my_cookie', 'Rfhue0ZI04Wu-JuVXSCvJnYb-oun-6rz');},
       success: function(data){
           console.log(data);
           console.log('upload successful!');

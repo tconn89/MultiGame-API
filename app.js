@@ -27,8 +27,50 @@
   users = require('./routes/users');
 
   fs = require('fs');
+  Session = require('./models/session');
 
-  
+//  local_authentication = require('./config/local_authentication')
+localAuthentication = function(req, res, next){
+  console.log('local authentication');
+  if(req.url == '/login' || req.url == '/register'){
+    return next();
+  }
+  if(!req.session){
+    return res.send('session undefined, you are not authorized');
+  }
+
+  var my_cookie;
+  console.log(`auth: ${req.headers.authorization}`);
+  console.log(`my_cookie: ${req.headers.my_cookie}`);
+  if(req.headers.authorization)
+    my_cookie = req.headers.authorization.split(',');
+  else if(req.headers.my_cookie)
+    my_cookie = req.headers.my_cookie.split(',');
+  else if(req.body.my_cookie)
+    my_cookie = req.body.my_cookie.split(',');
+  else
+    return res.status(401).send('no cookie data, you are not authorized')
+
+  Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
+    console.log(db_sesh);
+    if(err)
+      throw err;
+    if(db_sesh)
+      Account.findOne({id: db_sesh.user_id}, function(err, user){
+        console.log(user);
+        if(err)
+          throw err;
+        if(user){
+          req.user = user;
+          next();
+        }
+        else
+          res.status(401).send('anonymous session, you are not authorized')
+      });
+    else
+      res.status(401).send('no session on record, you are not authorized')
+  });
+}
 
   app = express();
 
@@ -62,6 +104,8 @@
   app.use(passport.session());
 
   app.use(express["static"](path.join(__dirname, 'public')));
+
+  app.use(localAuthentication);
 
   app.use('/', routes);
 
@@ -98,7 +142,7 @@
   var bodyParser = require('body-parser');
   app.use(bodyParser.json()); // support json encoded bodies
   app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-  
+
   if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
       res.status(err.status || 500);
