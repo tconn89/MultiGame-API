@@ -1,4 +1,4 @@
-Account = require('../models/account.js');
+Account = require('../../models/account.js');
 
 describe('Account', function() {
   beforeEach(function(done) {

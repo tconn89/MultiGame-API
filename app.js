@@ -31,7 +31,7 @@
 
 //  local_authentication = require('./config/local_authentication')
 localAuthentication = function(req, res, next){
-  console.log('local authentication');
+  console.log('authenticating..');
   if(req.url == '/login' || req.url == '/register'){
     return next();
   }
@@ -52,12 +52,10 @@ localAuthentication = function(req, res, next){
     return res.status(401).send('no cookie data, you are not authorized')
 
   Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
-    console.log(db_sesh);
     if(err)
       throw err;
     if(db_sesh)
       Account.findOne({id: db_sesh.user_id}, function(err, user){
-        console.log(user);
         if(err)
           throw err;
         if(user){

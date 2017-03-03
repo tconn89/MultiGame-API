@@ -1,14 +1,14 @@
-server = require('../bin/server');
+server = require('../../bin/server');
 chai = require('chai');
 chai = require('chai');
 chaiHttp = require('chai-http');
 should = chai.should();
 chai.use(chaiHttp);
 
-Session = require('../models/session');
-Account = require('../models/account');
+Session = require('../../models/session');
+Account = require('../../models/account');
 
-describe('Map#Save', function(){
+describe('root_authentication', function(){
   // how to hit endpoints
   beforeEach(function(done){
     Account.remove({}, function() {
@@ -34,7 +34,7 @@ describe('Map#Save', function(){
       })
     });
   });
-  it('it should SAVE one map', (done) => {
+  it('it should authenticate the request', (done) => {
 
     chai.request(server)
       .get('/')

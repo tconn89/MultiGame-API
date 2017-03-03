@@ -1,5 +1,6 @@
-var should = require('should');
-var Session = require('../models/session');
+var Session = require('../../models/session');
+should = require('should');
+
 describe('Session', function(){
   beforeEach(function(done){
     session = new Session({

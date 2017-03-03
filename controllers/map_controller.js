@@ -1,4 +1,5 @@
 Session = require('../models/session')
+
 formidable = require('formidable');
 
 mapController = function(){};
@@ -37,17 +38,13 @@ local_authentication = function(req, res, callback){
     return res.status(401).send('no cookie data, you are not authorized')
 
   Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
-    console.log('wtf');
     if(err)
       throw err;
-    console.log(db_sesh);
-    console.log('made it');
     if(db_sesh)
       Account.findOne({id: db_sesh.user_id}, function(err, user){
         if(user)
            callback(err, user);
         else{
-          console.log('anonymous sesh');
           res.status(401).send('anonymous session, you are not authorized')
         }
       });
