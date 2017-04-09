@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test'
 connect = require('mongodb').connect;
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');

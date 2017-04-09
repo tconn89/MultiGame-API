@@ -105,6 +105,10 @@ localAuthentication = function(req, res, next){
 
   app.use(localAuthentication);
 
+  MapPermission = require('./middleware/map_permissions');
+  mapPermission = new MapPermission();
+  app.use(mapPermission.isAllowed);
+
   app.use('/', routes);
 
   Account = require('./models/account');
@@ -119,7 +123,10 @@ localAuthentication = function(req, res, next){
 
   mongoose.Promise = global.Promise;
 
-  mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
+  if(process.env.NODE_ENV == 'test')
+    mongoose.connect('mongodb://localhost/test');
+  else
+    mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
   // mongoose.set('debug', function (collectionName, method, query, doc) {
 

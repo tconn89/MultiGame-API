@@ -1,58 +1,51 @@
-Session = require('../models/session')
+Session = require('../models/session');
+BinaryFile = require('../models/binary_file');
 
 formidable = require('formidable');
+path = require('path');
 
 mapController = function(){};
 mapController.prototype.upload = function(req, res) {
-  local_authentication(req, res, function(err, probly_user){
-    if(err)
-      throw err;
-  // user authorization
-  // if(!req.user){
-  //   console.error('you must be a user');
-  //   return res.status('401').send('you must be a user');
-  // }
-
-    console.log('mapController:upload');
-    configuredForm(req,res,false);
-  });
-  //configuredForm(req,res,true);
+  console.log('mapController:upload');
+  configuredForm(req,res,false);
 };
 
 module.exports = mapController;
 
-local_authentication = function(req, res, callback){
-  if(!req.session)
-    return res.send('session undefined, you are not authorized')
-
-  var my_cookie;
-  console.log(`auth: ${req.headers.authorization}`);
-  console.log(`my_cookie: ${req.headers.my_cookie}`);
-  if(req.headers.authorization)
-    my_cookie = req.headers.authorization.split(',');
-  else if(req.headers.my_cookie)
-    my_cookie = req.headers.my_cookie.split(',');
-  else if(req.body.my_cookie)
-    my_cookie = req.body.my_cookie.split(',');
-  else
-    return res.status(401).send('no cookie data, you are not authorized')
-
-  Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
-    if(err)
+addBinary = function(options){
+  BinaryFile.findOne({map_name:options.map_name}, function(err,doc){
+    if(err){
       throw err;
-    if(db_sesh)
-      Account.findOne({id: db_sesh.user_id}, function(err, user){
-        if(user)
-           callback(err, user);
-        else{
-          res.status(401).send('anonymous session, you are not authorized')
-        }
-      });
-    else
-      res.status(401).send('no session on record, you are not authorized')
+    }
+    if(doc){
+      // What if user doesn't own this map?
+      if(doc.user_id != options.user.id){
+        log =  `${options.user.username} does not own map `;
+        log += `${doc.map_name} with permission ${doc.getPermissionLevel()}`;
+        return console.log(log);
+      }
+      console.log('update mode')
+      b = doc;
+    }
+    else{
+      console.log('create mode')
+      b = new BinaryFile;
+      b.setPermissionLevel('private');
+      b.path = options.path;
+      b.created_at = new Date();
+      b.user_id = options.user.id;
+    }
+
+    b.updated_at = new Date();
+    //b.user_id = req.user.id;
+    b.map_name = options.map_name;
+    return b.save(function(err) {
+      if (err) {
+        return console.error('b failed: ' + err);
+      }
+    });
   });
 }
-
 configuredForm = function(req,res, binaryFlag){
   var map_name = req.headers.map_name;
   if(req.query.map_name)
@@ -76,19 +69,20 @@ configuredForm = function(req,res, binaryFlag){
       files.push([field,file]);
       file_path = path.join(form.uploadDir, map_name);
       fs.rename(file.path, file_path);
-      addBinary(file, map_name, file_path);
+      my_options = { file:file, map_name:map_name, path:file_path, user: req.user };
+      addBinary(my_options);
     })
     .on('error', function(err) {
       return console.log('An error has occured: \n' + err);
     })
     .on('end', function(){
-      console.log('-> upload done');
+      console.log('-> "END" event triggered');
+      res.writeHead(200, {'content-type': 'text/plain'});
+      res.write('received upload:\n\n');
+      res.end('files being uploaded');
     });
-  form.parse(req, function(err, fields, files) {
-    if(err)
-      console.log(err);
-    res.writeHead(200, {'content-type': 'text/plain'});
-    res.write('received upload:\n\n');
-    res.end(util.inspect({fields: fields, files: files}));
-  });
+    form.parse(req, function(err, fields, files) {
+      if(err)
+        console.log(err);
+    });
 }

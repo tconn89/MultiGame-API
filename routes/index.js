@@ -21,6 +21,9 @@
   MapController = require('../controllers/map_controller');
   mapController = new MapController();
 
+  PermissionController = require('../controllers/permissions_controller');
+  permissionController = new PermissionController();
+
   var Schema   = mongoose.Schema;
   var ObjectIdSchema = Schema.ObjectId;
   var ObjectId = mongoose.Types.ObjectId;
@@ -41,36 +44,6 @@
     return res.render('register', {});
   });
 
-  local_authentication = function(req, res, callback){
-    if(!req.session)
-      return res.send('session undefined, you are not authorized')
-
-    var my_cookie;
-    console.log(`auth: ${req.headers.authorization}`);
-    console.log(`my_cookie: ${req.headers.my_cookie}`);
-    if(req.headers.authorization)
-      my_cookie = req.headers.authorization.split(',');
-    else if(req.headers.my_cookie)
-      my_cookie = req.headers.my_cookie.split(',');
-    else if(req.body.my_cookie)
-      my_cookie = req.body.my_cookie.split(',');
-    else
-      return res.status(401).send('no cookie data, you are not authorized')
-
-    Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
-      if(err)
-        throw err;
-      if(db_sesh)
-        Account.findOne({id: db_sesh.user_id}, function(err, user){
-          if(user)
-             callback(err, user);
-          else
-            res.status(401).send('anonymous session, you are not authorized')
-        });
-      else
-        res.status(401).send('no session on record, you are not authorized')
-    });
-  }
   getIncrementedId = function(){
     return Account.findOne().sort({created_at: -1}).exec(function(err, account) {
       if(err){
@@ -137,6 +110,9 @@
     });
   });
 
+  router.put('/map_permission_level', function(req, res){
+    permissionController.update(req, res);
+  });
   router.post('/register', function(req, res, next) {
     username = req.body.username;
     password = req.body.password;
@@ -188,6 +164,7 @@
         session = new Session();
         req.session.cookie.maxAge = 3600000;
         return session.saveSesh(req.session.id, req.user, res);
+
       }
     });
   });
@@ -225,34 +202,28 @@
   }
   // sends file to client
   clientBinary = function(req,res){
-    local_authentication(req, res, function(err, probly_user){
+    var filename;
+    var params;
+    var map_name = req.headers.map_name;
+    if(req.query.map_name){
+      map_name = req.query.map_name;
+    }
+    params = {'map_name': map_name };
+    filename = 'binary';
+    console.log(`map_name: ${map_name}`);
+    BinaryFile.findOne(params, function(err, data){
       if(err)
-        throw err;
-      // if(!req.user)
-      // return res.status('401').send('you must sign in first');
-      var filename;
-      var params;
-      var map_name = req.headers.map_name;
-      if(req.query.map_name){
-        map_name = req.query.map_name;
-      }
-      params = {'map_name': map_name };
-      filename = 'binary';
-      console.log(`map_name: ${map_name}`);
-      BinaryFile.findOne(params, function(err, data){
-        if(err)
-          return res.render(err);
-        else
-          if(!data)
-            return res.status(400).send(`No maps by name: ${map_name}`);
-          mimetype = mime.lookup(data.path);
-          console.log(mimetype);
-          filename = data.path.split('/').pop();
-          res.setHeader('Content-Description','File Transfer');
-          res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-          res.setHeader('Content-Type', mimetype);
-          res.status('200').end(fs.readFileSync(data.path));
-      });
+        return res.render(err);
+      else
+        if(!data)
+          return res.status(400).send(`No maps by name: ${map_name}`);
+        mimetype = mime.lookup(data.path);
+        console.log(mimetype);
+        filename = data.path.split('/').pop();
+        res.setHeader('Content-Description','File Transfer');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.setHeader('Content-Type', mimetype);
+        res.status('200').end(fs.readFileSync(data.path));
     });
   };
   router.get('/binary',
@@ -357,70 +328,6 @@
     mapController.upload(req, res);
   });
 
-  configuredForm = function(req,res, binaryFlag){
-    var map_name = req.headers.map_name;
-    if(req.query.map_name)
-      map_name = req.query.map_name;
-    if(!map_name)
-      return res.status(400).send('Need a map name').end();
-
-    var form;
-    form = new formidable.IncomingForm({noFileSystem: binaryFlag}),
-      files = [],
-      fields = [];
-    form.multiples = true;
-    form.uploadDir = path.join(__dirname, '/../public/uploads');
-    form
-      .on('field', function(field, buffer) {
-        console.log('on field');
-        fields.push([field, buffer]);
-      })
-      .on('file', function(field, file) {
-        console.log('on file');
-        files.push([field,file]);
-        file_path = path.join(form.uploadDir, map_name);
-        fs.rename(file.path, file_path);
-        addBinary(file, map_name, file_path);
-      })
-      .on('error', function(err) {
-        return console.log('An error has occured: \n' + err);
-      })
-      .on('end', function(){
-        console.log('-> upload done');
-      });
-    form.parse(req, function(err, fields, files) {
-      if(err)
-        console.log(err);
-      res.writeHead(200, {'content-type': 'text/plain'});
-      res.write('received upload:\n\n');
-      res.end(util.inspect({fields: fields, files: files}));
-    });
-  }
-
-  addBinary = function(file, map_name, path){
-    BinaryFile.findOne({map_name:map_name}, function(err,doc){
-      if(err){
-        throw err;
-      }
-      if(doc)
-        b = doc;
-      else{
-        b = new BinaryFile;
-        b._id = new ObjectId();
-        b.path = file_path;
-        b.created_at = new Date();
-      }
-
-      b.updated_at = new Date();
-      //b.user_id = req.user.id;
-      b.map_name = map_name;
-      return b.save(function(err) {
-        if (err) {
-          return console.error('b failed: ' + err);
-        }
-      });
-    });
-  }
   module.exports = router;
 
 }).call(this);

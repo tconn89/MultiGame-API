@@ -1,12 +1,13 @@
 server = require('../../bin/server');
 chai = require('chai');
-chaiHttp = require('chai-http');
 should = chai.should();
-chai.use(chaiHttp);
-const {readFileSync} = require("fs");
+chai.use(require('chai-http'));
+fs = require('fs')
+const {readFileSync} = require('fs');
 
 Session = require('../../models/session');
 Account = require('../../models/account');
+BinaryFile = require('../../models/binary_file');
 
 describe('root_authentication', function(){
   // how to hit endpoints
@@ -44,7 +45,18 @@ describe('root_authentication', function(){
       .end((err, res) => {
         console.log(res.text);
         res.should.have.status(200);
-        done();
+        setTimeout(function(){
+          BinaryFile.findOne({map_name: 'swatchbuckler'}, function(err, map){
+            if(err)
+              console.log(err);
+            fs.statSync(map.path).isFile().should.be.true;
+            done();
+          });
+        }, 500);
       });
+  });
+  after(function(done) {
+    fs.unlinkSync('public/uploads/swatchbuckler')
+    done();
   });
 });
