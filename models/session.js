@@ -15,18 +15,26 @@
   });
   Session.methods.saveSesh = function(clientSecret, user, res){
     session = this;
-    // client to 
+    // client to
     session.secret = clientSecret;
     //session.path = req.session.cookie.path;
     session.user_id = user.id;
     session.save(function(err){
       if(err)
         console.error(err);
-      return res.send({'session': clientSecret})
+      return res.send({'session': clientSecret});
+    });
+  }
+  Session.methods.expire = function(callback){
+    this.secret = 0;
+    this.save(function(err){
+      if(err)
+        console.error(err);
+      return callback();
     });
   }
 
-  
+
   // Session.plugin(passportLocalMongoose);
 
   module.exports = mongoose.model('Session', Session);

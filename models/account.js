@@ -15,7 +15,9 @@
   Account = new Schema({
     username: String,
     password: String,
-    created_at: Date
+    created_at: Date,
+    passwordResetToken: String,
+    passwordResetExpiration: Date 
   });
   Account.plugin(autoIncrement.plugin, { model: 'accounts', field: 'id' });
   Account.plugin(passportLocalMongoose);

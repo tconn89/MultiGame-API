@@ -23,9 +23,4 @@ describe('Account', function() {
       done();
     });
   });
-  afterEach(function(done) {
-    Account.remove({}, function() {
-      done();
-    });
-  });
 });

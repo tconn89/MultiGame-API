@@ -16,7 +16,7 @@ isLoadURL = function(url){
 };
 MapPermission.prototype.isAllowed = function(req, res, next){
   mapName = req.query.map_name;
-  // seems insecure
+  // seems bad
   if(!mapName)
     return next()
   BinaryFile.findOne({map_name: mapName}, function(err, map){

@@ -110,7 +110,7 @@
     });
   });
 
-  router.put('/map_permission_level', function(req, res){
+  router.post('/map_permission_level', function(req, res){
     permissionController.update(req, res);
   });
   router.post('/register', function(req, res, next) {
@@ -123,12 +123,16 @@
       //res.clearCookie('connect.sid');
       return res.status(400).send('missing field data').end();
     }
+      // User by that name already exists
+      // if(user)
+      //   return res.status(400).send(`user by name: ${user.username} already taken`).end();
+
     return Account.register(new Account({
       username: req.body.username,
       created_at: new Date
     }), req.body.password, function(err, account) {
       if (err) {
-        return res.status(500).send(err.message);
+        return res.status(400).send(err.message);
       }
       return passport.authenticate('local')(req, res, function() {
         req.session.cookie.maxAge = 3600000;
@@ -150,56 +154,40 @@
   });
 
   router.post('/login', passport.authenticate('local', {
-    failureRedirect: '/login',
     failureFlash: true
   }), function(req, res, next) {
     console.log(req.session.id);
-    Session.findOne({secret: req.session.id}, function(err,doc){
-      if(err)
-        console.error(err);
-      if(doc)
-        console.log(`user_id: ${doc.user_id}`);
-        // renew session
-      else{
-        session = new Session();
-        req.session.cookie.maxAge = 3600000;
-        return session.saveSesh(req.session.id, req.user, res);
+    if(req.session.id){
+      Session.findOne({secret: req.session.id}, function(err,doc){
+        if(err)
+          console.error(err);
+        if(doc)
+          console.log(`user_id: ${doc.user_id}`);
+          // renew session
+        else{
+          session = new Session();
+          req.session.cookie.maxAge = 3600000;
+          return session.saveSesh(req.session.id, req.user, res);
 
-      }
-    });
+        }
+      });
+    } else{
+
+    }
   });
 
   router.get('/logout', function(req, res, next) {
-    req.logout();
-    return req.session.save(function(err) {
-      if (err) {
-        return next(err);
-      }
-      return res.redirect('/');
+    Session.findOne({user_id: req.user.id }, (err, session) => {
+      if(err)
+        console.error(err);
+      session.expire(() => {
+        user = req.user.username;
+        req.session.destroy();
+        res.status(200).send({message: `${user} logged out`})
+      });
     });
   });
 
-  // saves file on server side
-  execBinary = function(req,res){
-    BinaryFile.findOne({'_id': ObjectId("586abc7365a453f63f9d15a9")}, function(err, data){
-      if(err)
-        return res.render(err);
-      else
-        wstream = fs.createWriteStream('myoutput1', { encoding: 'binary' });
-        wstream.on('data', (chunk) => {
-          console.log(`Received ${chunk.length} bytes of data.`);
-        });
-        console.log('attempting to write file');
-        wstream.write(new Buffer(data.binary), function(err){
-          if(err){
-            throw err;
-          }
-          console.log('file written!')
-        });
-        wstream.end();
-        return
-    });
-  }
   // sends file to client
   clientBinary = function(req,res){
     var filename;
@@ -235,8 +223,8 @@
       user: req.user
     });
   });
+  // Just an idea, not working
   router.get('redis', function(req, res){
-    client
     server.open(function(err){
       if(err == null){
         // do some stuff

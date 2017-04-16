@@ -28,6 +28,7 @@ describe("top", function () {
     });
     importTest("session", './models/session_spec.js');
     importTest("account", './models/account_spec.js');
+    importTest("permissionLevel", './models/permission_level_spec.js');
     after(function(done) {
       mongoose.connection.close();
       done();

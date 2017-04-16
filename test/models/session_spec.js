@@ -22,9 +22,4 @@ describe('Session', function(){
       done();
     });
   });
-  afterEach(function(done) {
-    Session.remove({}, function() {
-      done();
-    });
-  });
 });
