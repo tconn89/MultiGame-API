@@ -2,9 +2,14 @@
 (function() {
   var Account, BinaryFile, express, formidable, fs, passport, path, router;
 
+
   express = require('express');
 
   passport = require('passport');
+
+  async = require('async');
+  crypto = require('crypto');
+  nodemailer = require('nodemailer');
 
   util = require('util');
 
@@ -116,9 +121,9 @@
   router.post('/register', function(req, res, next) {
     username = req.body.username;
     password = req.body.password;
+    email = req.body.email;
     console.log(`user: ${username}`);
-    console.log(`pass: ${password}`);
-    if(!username || !password){
+    if(!username || !password || !email){
       req.session.destroy();
       //res.clearCookie('connect.sid');
       return res.status(400).send('missing field data').end();
@@ -128,7 +133,8 @@
       //   return res.status(400).send(`user by name: ${user.username} already taken`).end();
 
     return Account.register(new Account({
-      username: req.body.username,
+      username: username,
+      email: email,
       created_at: new Date
     }), req.body.password, function(err, account) {
       if (err) {
@@ -139,6 +145,7 @@
         // do not duplicate in db sessions
         // need to be async
         session = new Session();
+        session.created_at = new Date;
         session.saveSesh(req.session.id, req.user, res);
       });
     });
@@ -156,24 +163,14 @@
   router.post('/login', passport.authenticate('local', {
     failureFlash: true
   }), function(req, res, next) {
-    console.log(req.session.id);
-    if(req.session.id){
-      Session.findOne({secret: req.session.id}, function(err,doc){
-        if(err)
-          console.error(err);
-        if(doc)
-          console.log(`user_id: ${doc.user_id}`);
-          // renew session
-        else{
-          session = new Session();
-          req.session.cookie.maxAge = 3600000;
-          return session.saveSesh(req.session.id, req.user, res);
-
-        }
-      });
-    } else{
-
-    }
+    Session.findOne({user_id: req.user.id}, function(err, session){
+      if(err)
+        console.error(err);
+      if(!session){
+        console.error('this should never happen')
+      }
+      return session.saveSesh(req.session.id, req.user, res);
+    });
   });
 
   router.get('/logout', function(req, res, next) {
@@ -314,6 +311,123 @@
 
   router.post('/upload', function(req, res){
     mapController.upload(req, res);
+  });
+
+  // forgot password initilize recovery email
+  var nodemailer = require('nodemailer')
+  var mg = require('nodemailer-mailgun-transport')
+  var auth = {
+    auth: {
+      api_key: 'key-ac5c436f177ccbc638224cb577553aae',
+      domain: 'api.terrium.net'
+    }
+  }
+
+  var nodemailerMailgun = nodemailer.createTransport(mg(auth));
+  router.post('/forgot', function(req, res, next) {
+    async.waterfall([
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        Account.findOne({ email: req.body.email }, function(err, user) {
+          if (!user) {
+            return res.status(400).send({message: 'No account with that email address exists'});
+          }
+
+          user.resetPasswordToken = token;
+          user.resetPasswordExpiration = Date.now() + 3600000; // 1 hour
+
+          user.save(function(err) {
+            done(err, token, user);
+          });
+        });
+      },
+      function(token, user, done) {
+        var mailOptions = {
+          to: user.email,
+          from: 'passwordreset@demo.com',
+          subject: 'Node.js Password Reset',
+          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+        };
+        nodemailerMailgun.sendMail(mailOptions, (err, info) => {
+          if(err)
+            console.error(err)
+          console.log('Response: ' + info)
+          done(err, 'done');
+        });
+        //smtpTransport.sendMail(mailOptions, function(err) {
+        //  req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+         // done(err, 'done');
+        //});
+      }
+    ], function(err) {
+      if (err) return next(err);
+      res.send({message: 'Your password reset email has been sent'});
+    });
+  });
+
+  // login user and
+  router.get('/reset/:token', function(req, res) {
+    Account.findOne({ resetPasswordToken: req.params.token, resetPasswordExpiration: { $gt: Date.now() } }, function(err, user) {
+      if (!user) {
+        return res.status(401).send({message: 'Password reset token is invalid or has expired'});
+      }
+      Session.findOne({user_id: user.id}, (err, session) => {
+        if(err)
+          console.error(err);
+        session.saveSesh(req.params.token, user, res, function(){
+          res.render('reset');
+        });
+      });
+    });
+  });
+
+  router.post('/reset/:token', function(req, res) {
+    async.waterfall([
+      function(done) {
+        Account.findOne({ resetPasswordToken: req.params.token, resetPasswordExpiration: { $gt: Date.now() } }, function(err, user) {
+          if (!user) {
+            return res.status(401).send({message: 'Password reset token is invalid or has expired.'});
+          }
+
+          user.resetPasswordToken = undefined;
+          user.resetPasswordExpiration = undefined;
+          user.setPassword(req.body.password, () => {
+            user.save(function(err) {
+              req.logIn(user, function(err) {
+                done(err, user);
+              });
+            });
+          });
+        });
+      },
+      function(user, done) {
+        var mailOptions = {
+          to: user.email,
+          from: 'passwordreset@terrium.com',
+          subject: 'Your password has been changed',
+          text: 'Hello,\n\n' +
+            'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+        };
+        nodemailerMailgun.sendMail(mailOptions, (err, info) => {
+          if(err)
+            console.error(err)
+          console.log('Response: ' + info)
+          done(err, 'done');
+        });
+      }
+    ], function(err) {
+      if(err)
+        console.error(err);
+      res.send({message: 'password update email successfully sent'});
+    });
   });
 
   module.exports = router;

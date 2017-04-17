@@ -13,11 +13,12 @@
   autoIncrement.initialize(connection);
 
   Account = new Schema({
+    email: String,
     username: String,
     password: String,
     created_at: Date,
-    passwordResetToken: String,
-    passwordResetExpiration: Date 
+    resetPasswordToken: String,
+    resetPasswordExpiration: Date
   });
   Account.plugin(autoIncrement.plugin, { model: 'accounts', field: 'id' });
   Account.plugin(passportLocalMongoose);

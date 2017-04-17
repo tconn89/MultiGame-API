@@ -1,0 +1,39 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title Reset password
+    link(href='https://fonts.googleapis.com/css?family=Raleway', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
+  body
+    .container
+      .row
+      block content
+        form(method='POST')
+          legend Reset Password
+          div.errors
+          .form-group
+            label(for='password') New Password
+            input.form-control(type='password', name='password', value='', placeholder='New password', autofocus=true)
+          .form-group
+            label(for='confirm') Confirm Password
+            input.form-control(type='password', name='confirm', value='', placeholder='Confirm password')
+          .form-group
+            button.btn.btn-primary(type='submit') Update Password
+      script(src='https://code.jquery.com/jquery-2.2.0.min.js')
+      script.
+        $('form').submit((e) => {
+          confirmed = $('input[name=password]')[0].value == $('input[name=confirm]')[0].value
+          long_enough = $('input[name=password]')[0].value.length > 7
+          if(!long_enough){
+            $('.errors').text('Passwords must be atleast 8 characters').css("color", "red")
+            return false
+          }
+          if(!confirmed){
+            $('.errors').text('Passwords must match').css("color", "red")
+            return false
+          }
+          return true
+        })

@@ -11,17 +11,21 @@
     path: String,
     secret: String,
     user_id: Number,
-    created_at: Date
+    created_at: Date,
+    updated_at: Date
   });
-  Session.methods.saveSesh = function(clientSecret, user, res){
+  Session.methods.saveSesh = function(clientSecret, user, res, cb = null){
     session = this;
     // client to
     session.secret = clientSecret;
     //session.path = req.session.cookie.path;
     session.user_id = user.id;
+    session.updated_at = new Date;
     session.save(function(err){
       if(err)
         console.error(err);
+      if(cb)
+        return cb();
       return res.send({'session': clientSecret});
     });
   }

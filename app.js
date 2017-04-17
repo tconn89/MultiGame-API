@@ -32,7 +32,10 @@
 //  local_authentication = require('./config/local_authentication')
 localAuthentication = function(req, res, next){
   console.log('authenticating..');
-  if(req.url == '/login' || req.url == '/register'){
+  if(req.url == '/login' || req.url == '/register' || req.url == '/forgot'){
+    return next();
+  }
+  if(req.url.match(/\/reset\//)){
     return next();
   }
   if(!req.session){
@@ -54,7 +57,11 @@ localAuthentication = function(req, res, next){
   Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
     if(err)
       throw err;
-    if(db_sesh)
+    if(db_sesh){
+      // measured in milli seconds expires in 1 hour
+      if(db_sesh.updated_at - new Date > (60 * 60 * 1000))
+        return res.status(401).send('expired session, plz login');
+
       Account.findOne({id: db_sesh.user_id}, function(err, user){
         if(err)
           throw err;
@@ -63,10 +70,11 @@ localAuthentication = function(req, res, next){
           next();
         }
         else
-          res.status(401).send('anonymous session, you are not authorized')
+          return res.status(401).send('anonymous session, you are not authorized')
       });
+    }
     else
-      res.status(401).send('no session on record, you are not authorized')
+      return res.status(401).send('no session on record, you are not authorized')
   });
 }
 
