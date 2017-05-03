@@ -17,12 +17,16 @@ isLoadURL = function(url){
 MapPermission.prototype.isAllowed = function(req, res, next){
   mapName = req.query.map_name;
   // seems bad
-  if(!mapName)
+  if(!mapName )
     return next()
+
   BinaryFile.findOne({map_name: mapName}, function(err, map){
     if(err)
       console.error(err);
     console.log('Does user own map?');
+    //Does map exist?
+    if(!map)
+      return next()
     // if user owns the map, all good -- no logic
     if(isOwner(map, req.user))
       return next();

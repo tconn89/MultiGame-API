@@ -26,7 +26,7 @@
         console.error(err);
       if(cb)
         return cb();
-      return res.send({'session': clientSecret});
+      return res.send({'session': clientSecret, user: user.username});
     });
   }
   Session.methods.expire = function(callback){

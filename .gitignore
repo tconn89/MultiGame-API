@@ -5,9 +5,7 @@
 .DS_Store
 .idea/
 .sass-cache
-*~
 node_modules
 *.out
 npm-debug.log
-package.json
 public/uploads
