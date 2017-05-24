@@ -257,8 +257,10 @@
       names = [];
       i = 0;
       docs.forEach(function(ref){
-        if(ref.map_name)
-          names.push(ref.map_name);
+        if(ref.map_name){
+          if(!ref.map_name.endsWith('Terrain'))
+            names.push(ref.map_name);
+        }
       });
       maps = {
         'maps': names
