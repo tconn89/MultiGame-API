@@ -249,8 +249,16 @@
     return res.render('upload');
   });
 
+
   router.get('/maps_index', function(req, res){
-    BinaryFile.find({}, function(err, docs){
+    permissionLevel = req.query.permission;
+    if(!permissionLevel)
+      permissionLevel = 'protected';
+    permissionID = BinaryFile.getPermissionID(permissionLevel);
+    params = {permission_level_id: permissionID}
+    if(permissionID == 1)
+      params.user_id = req.user.id
+    BinaryFile.find({permission_level_id:permissionID}, function(err, docs){
       if(err){
         throw err;
       }

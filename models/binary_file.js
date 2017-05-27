@@ -43,6 +43,16 @@
     }
   }
 
+  BinaryFile.statics.getPermissionID = function(permissionString){
+    if(permissionString == 'private')
+      return 1;
+    if(permissionString == 'protected')
+      return 2;
+    if(permissionString == 'public')
+      return 3;
+    return 0;
+  }
+
   // BinaryFile.plugin(passportLocalMongoose);
 
   module.exports = mongoose.model('BinaryFile', BinaryFile);
