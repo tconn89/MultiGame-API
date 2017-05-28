@@ -118,8 +118,7 @@
   router.post('/map_permission_level', function(req, res){
     permissionController.update(req, res);
     //quick hack for terrains
-    req.query.map_name += "Terrain";
-    permissionController.update(req, res);
+    permissionController.update(req, res, "Terrain");
   });
   router.post('/register', function(req, res, next) {
     username = req.body.username;
