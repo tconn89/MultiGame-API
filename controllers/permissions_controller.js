@@ -6,7 +6,8 @@ path = require('path');
 
 permissionController = function(){};
 
-permissionController.prototype.update = function(req, res, opts = ""){
+permissionController.prototype.update = function(req, res, opts){
+  opts = opts || "";
   permission = req.query.permission;
   map_name = req.query.map_name;
   if(opts)
