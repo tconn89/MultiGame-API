@@ -258,7 +258,7 @@
     params = {permission_level_id: permissionID}
     if(permissionID == 1)
       params.user_id = req.user.id
-    BinaryFile.find({permission_level_id:permissionID}, function(err, docs){
+    BinaryFile.find(params, function(err, docs){
       if(err){
         throw err;
       }
