@@ -17,17 +17,17 @@ permissionController.prototype.update = function(req, res, opts = ""){
       console.error(err);
     if(!doc){
       console.error(`no map found by name: ${map_name}`);
-      return res.status(400).send(`No map found named ${map_name}`).end();
+      return {status: 400, message: `No map found named ${map_name}`};
     } else if(doc.user_id != user.id) {
       log = `${user.username} not the owner of ${map_name}`;
       console.error(log);
-      res.status(401).send(log);
+      return {status: 401, message: log};
     } else {
       doc.setPermissionLevel(permission, function(err){
         if(err)
           console.error(err);
       });
-      res.status(200).send(`Set permission level to ${permission}`).end();
+      return {status: 200, message: `Set permission level to ${permission}`};
     }
   });
 };
