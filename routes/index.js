@@ -116,15 +116,18 @@
   });
 
   router.post('/map_permission_level', function(req, res){
-    myRes = permissionController.update(req, res);
+    permissionController.update(req, res, "", function(myRes){
+      if(myRes.status == 200){
+        permissionController.update(req, res, "Terrain", function(terrainRes){
+          if(terrainRes.status != 200)
+            return res.status(terrainRes.status).send(terrainRes.message);
+          res.status(myRes.status).send(myRes.message);
+        });
+      } else {
+        res.status(myRes.status).send(myRes.message);
+      }
+    });
 
-    //quick hack for terrains
-    if(myRes.status == 200){
-      terrainRes = permissionController.update(req, res, "Terrain");
-      if(terrainRes.status != 200)
-        return res.status(terrainRes.status).send(terrainRes.message);
-    }
-    res.status(myRes.status).send(myRes.message);
   });
   router.post('/register', function(req, res, next) {
     username = req.body.username;
