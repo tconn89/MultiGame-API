@@ -9,8 +9,49 @@
   passportLocalMongoose = require('passport-local-mongoose');
 
   BinaryFile = new Schema({
-    binary: Buffer
+    path: String,
+    map_name: String,
+    permission_level_id: Number,
+    user_id: Number,
+    created_at: Date,
+    updated_at: Date,
+    permission: String
   });
+  BinaryFile.methods.setPermissionLevel = function(level, callback){
+    if(level == 'private'){
+      this.permission_level_id = 1;
+    } else if(level == 'protected'){
+      this.permission_level_id = 2;
+    } else if(level == 'public'){
+      this.permission_level_id = 3;
+    } else {
+      console.error('not a valid permission level');
+      throw 'not a valid permission level';
+    }
+    this.save(callback);
+  }
+
+  BinaryFile.methods.getPermissionLevel = function(){
+    if(this.permission_level_id == 1){
+      return 'private'
+    } else if(this.permission_level_id == 2){
+      return 'protected'
+    } else if(this.permission_level_id == 3){
+      return 'public'
+    } else {
+      console.error(`${this.map_name} does not have a permission level`);
+    }
+  }
+
+  BinaryFile.statics.getPermissionID = function(permissionString){
+    if(permissionString == 'private')
+      return 1;
+    if(permissionString == 'protected')
+      return 2;
+    if(permissionString == 'public')
+      return 3;
+    return 0;
+  }
 
   // BinaryFile.plugin(passportLocalMongoose);
 

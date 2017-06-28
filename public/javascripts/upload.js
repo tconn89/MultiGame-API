@@ -22,14 +22,15 @@ $('#upload-input').on('change', function(){
       // add the files to formData object for the data payload
       formData.append('uploads[]', file, file.name);
     }
-    console.log 
     $.ajax({
-      url: '/upload',
+      url: '/upload?map_name=quality',
       type: 'POST',
       data: formData,
       processData: false,
       contentType: false,
+      beforeSend: function(xhr){xhr.setRequestHeader('my_cookie', 'Rfhue0ZI04Wu-JuVXSCvJnYb-oun-6rz');},
       success: function(data){
+          console.log(data);
           console.log('upload successful!');
       },
       xhr: function() {

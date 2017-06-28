@@ -97,4 +97,5 @@
 
   server.on('listening', onListening);
 
+  module.exports = app
 }).call(this);

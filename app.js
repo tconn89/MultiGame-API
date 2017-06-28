@@ -26,9 +26,57 @@
 
   users = require('./routes/users');
 
-  var responseTime = require('response-time');
-  var axios = require('axios');
-  
+  fs = require('fs');
+  Session = require('./models/session');
+
+//  local_authentication = require('./config/local_authentication')
+localAuthentication = function(req, res, next){
+  console.log('authenticating..');
+  if(req.url == '/login' || req.url == '/register' || req.url == '/forgot'){
+    return next();
+  }
+  if(req.url.match(/\/reset\//)){
+    return next();
+  }
+  if(!req.session){
+    return res.send('session undefined, you are not authorized');
+  }
+
+  var my_cookie;
+  console.log(`auth: ${req.headers.authorization}`);
+  console.log(`my_cookie: ${req.headers.my_cookie}`);
+  if(req.headers.authorization)
+    my_cookie = req.headers.authorization.split(',');
+  else if(req.headers.my_cookie)
+    my_cookie = req.headers.my_cookie.split(',');
+  else if(req.body.my_cookie)
+    my_cookie = req.body.my_cookie.split(',');
+  else
+    return res.status(401).send('no cookie data, you are not authorized')
+
+  Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
+    if(err)
+      throw err;
+    if(db_sesh){
+      // measured in milli seconds expires in 1 hour
+      if(db_sesh.updated_at - new Date > (60 * 60 * 1000))
+        return res.status(401).send('expired session, plz login');
+
+      Account.findOne({id: db_sesh.user_id}, function(err, user){
+        if(err)
+          throw err;
+        if(user){
+          req.user = user;
+          next();
+        }
+        else
+          return res.status(401).send('anonymous session, you are not authorized')
+      });
+    }
+    else
+      return res.status(401).send('no session on record, you are not authorized')
+  });
+}
 
   app = express();
 
@@ -36,7 +84,6 @@
 
   app.set('view engine', 'jade');
 
-  app.use(responseTime());
 
   app.use(favicon(__dirname + '/public/favicon.ico'));
 
@@ -64,6 +111,12 @@
 
   app.use(express["static"](path.join(__dirname, 'public')));
 
+  app.use(localAuthentication);
+
+  MapPermission = require('./middleware/map_permissions');
+  mapPermission = new MapPermission();
+  app.use(mapPermission.isAllowed);
+
   app.use('/', routes);
 
   Account = require('./models/account');
@@ -78,14 +131,30 @@
 
   mongoose.Promise = global.Promise;
 
-  mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
+  if(process.env.NODE_ENV == 'test')
+    mongoose.connect('mongodb://localhost/test');
+  else
+    mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
 
+  // mongoose.set('debug', function (collectionName, method, query, doc) {
+
+  //   log = `${method} requested ${query.model}.${query.field}`
+  //   fs.appendFile(__dirname + '/logs/mongo.log', log, function(err){
+  //     if(err)
+  //       throw err;
+  //   });
+  // });
+  mongoose.set('debug', true);
   app.use(function(req, res, next) {
     var err;
     err = new Error('Not Found');
     err.status = 404;
     return next(err);
   });
+
+  var bodyParser = require('body-parser');
+  app.use(bodyParser.json()); // support json encoded bodies
+  app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
   if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
