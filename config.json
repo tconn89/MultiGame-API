@@ -1,0 +1,19 @@
+{
+  "root": "./",
+  "pidPath": "pids",
+  "sockPath": "sock",
+  "logFile": "/var/www/node_server/log/dev.log",
+  "watch": true,
+  "loglength": 100,
+  "logstream": false,
+  "columns": [
+    "uid",
+    "command",
+    "script",
+    "forever",
+    "pid",
+    "id",
+    "logfile",
+    "uptime"
+  ]
+}
