@@ -92,7 +92,7 @@ COPY . /var/www/node_server
 
 EXPOSE 3000
 RUN mkdir /var/www/node_server/log
-RUN FOREVER_ROOT="/var/www/node_server" forever start
+RUN FOREVER_ROOT="/var/www/node_server" forever start bin/server.js
 
 # CMD ["bin/bash"]
 # CMD [ "npm", "run-script", "mongo_start" ]
