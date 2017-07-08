@@ -2,6 +2,7 @@
 /logs
 /log
 /tmp
+/pids
 .DS_Store
 .idea/
 .sass-cache
