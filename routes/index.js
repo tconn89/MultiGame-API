@@ -25,6 +25,8 @@
 
   MapController = require('../controllers/map_controller');
   mapController = new MapController();
+  UserController = require('../controllers/user_controller');
+  userController = new userController();
 
   PermissionController = require('../controllers/permissions_controller');
   permissionController = new PermissionController();
@@ -143,9 +145,13 @@
       // if(user)
       //   return res.status(400).send(`user by name: ${user.username} already taken`).end();
 
+    token = crypto.randomBytes(20).toString('hex');
+    console.log(`token ${token}`);
     return Account.register(new Account({
       username: username,
       email: email,
+      emailToken: token,
+      emailPending: true,
       created_at: new Date
     }), req.body.password, function(err, account) {
       if (err) {
@@ -157,8 +163,29 @@
         // need to be async
         session = new Session();
         session.created_at = new Date;
-        session.saveSesh(req.session.id, req.user, res);
+        session.saveSesh(req.session.id, req.user, res, function(){
+          userController.sendVerificationMail(req, function(err){
+            if(err){
+              Account.find({ username:req.user.username }).remove().exec();
+              res.status(400).send(`${req.user.email} is not a valid email address`);
+            }
+            else
+              res.status(200).send(`Email sent to ${req.user.email}, please verify before proceeding`);
+          });
+        });
       });
+    });
+  });
+
+  router.get('/email/:token', function(req, res){
+    Account.findOne({emailToken: req.params.token}, function(err, user){
+      user.emailPending = false;
+      user.emailToken = -1;
+      user.save(function(err){
+        if(err)
+          console.error(err);
+      })
+      return res.status(200).send(`email verified, ${user.username} may login now`);
     });
   });
 
@@ -174,6 +201,8 @@
   router.post('/login', passport.authenticate('local', {
     failureFlash: true
   }), function(req, res, next) {
+    if(req.user.emailPending)
+      return res.status(400).send('User has not verified their email address');
     Session.findOne({user_id: req.user.id}, function(err, session){
       if(err)
         console.error(err);

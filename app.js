@@ -35,6 +35,9 @@ localAuthentication = function(req, res, next){
   if(req.url == '/login' || req.url == '/register' || req.url == '/forgot'){
     return next();
   }
+  // email token verification omitted
+  if(req.url.startsWith('/email'))
+    return next();
   if(req.url.match(/\/reset\//)){
     return next();
   }
