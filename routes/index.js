@@ -43,80 +43,17 @@
 
   router = express.Router();
 
+  // Verify the user is signed in
   router.get('/', function(req, res) {
     res.type('text/plain').send(`${req.user.username} just started a new session`);
   });
 
+  // Render a registration page
   router.get('/register', function(req, res) {
     return res.render('register', {});
   });
 
-  getIncrementedId = function(){
-    return Account.findOne().sort({created_at: -1}).exec(function(err, account) {
-      if(err){
-        console.log(err);
-        return 1;
-      }
-      if(account){
-        if(account.id)
-          return 1 + account.id;
-      }
-      else
-        return 1;
-    });
-  }
-  router.get('/drop', function(req,res){
-    mongoose.connection.db.dropCollection('accounts', function(err, result) {
-      if(err)
-        return console.log(err);
-      res.send('deleted');
-    });
-
-  });
-
-  function dropCollection (modelName) {
-    if (!modelName || !modelName.length) {
-      Promise.reject(new Error('You must provide the name of a model.'));
-    }
-
-    try {
-      var model = mongoose.model(modelName);
-      var collection = mongoose.connection.collections[model.collection.collectionName];
-    } catch (err) {
-      return Promise.reject(err);
-    }
-
-    return new Promise(function (resolve, reject) {
-      collection.drop(function (err) {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        // Remove mongoose's internal records of this
-        // temp. model and the schema associated with it
-        delete mongoose.models[modelName];
-        delete mongoose.modelSchemas[modelName];
-
-        resolve();
-      });
-    });
-  }
-  router.get('/real_drop', function(req,res){
-    dropCollection('accounts');
-    res.send('good to go');
-  });
-
-  router.get("/session", function(req, res){
-    session = req.session;
-    console.log(`Session Store: ${req.session.store}`);
-    console.log(`Cookie: ${Session.cookie}`);
-
-    session.store.get(req.sessionID, function(err, data) {
-      res.send({err: err, data:data});
-    });
-  });
-
+  // Change the permission level to Public, Protected, or Private
   router.post('/map_permission_level', function(req, res){
     permissionController.update(req, res, "", function(myRes){
       if(myRes.status == 200){
@@ -131,6 +68,7 @@
     });
 
   });
+  // Send user registration credentials to server
   router.post('/register', function(req, res, next) {
     username = req.body.username;
     password = req.body.password;
@@ -141,10 +79,6 @@
       //res.clearCookie('connect.sid');
       return res.status(400).send('missing field data').end();
     }
-      // User by that name already exists
-      // if(user)
-      //   return res.status(400).send(`user by name: ${user.username} already taken`).end();
-
     token = crypto.randomBytes(20).toString('hex');
     console.log(`token ${token}`);
     return Account.register(new Account({
@@ -177,6 +111,7 @@
     });
   });
 
+  // Resend Verification Email
   router.post('/email/resend', function(req, res){
     Account.findOne({username: req.body.username}, function(err, user){
       if(err || user == null)
@@ -195,6 +130,7 @@
     })
   });
 
+  // Tell the server you are the authorized user to reset password
   router.get('/email/:token', function(req, res){
     Account.findOne({emailToken: req.params.token}, function(err, user){
       user.emailPending = false;
@@ -216,6 +152,8 @@
     });
   });
 
+  // Authenticate the user and return a unique session id
+  // User must have verified email address to login
   router.post('/login', passport.authenticate('local', {
     failureFlash: true
   }), function(req, res, next) {
@@ -231,6 +169,7 @@
     });
   });
 
+  // Expire the user session
   router.get('/logout', function(req, res, next) {
     Session.findOne({user_id: req.user.id }, (err, session) => {
       if(err)
@@ -269,17 +208,13 @@
         res.status('200').end(fs.readFileSync(data.path));
     });
   };
+  // Download a serialized binary file
   router.get('/binary',
     clientBinary
   );
 
-  router.get('/', function(req, res) {
-    return res.render('index', {
-      user: req.user
-    });
-  });
   // Just an idea, not working
-  router.get('redis', function(req, res){
+  router.get('/redis', function(req, res){
     server.open(function(err){
       if(err == null){
         // do some stuff
@@ -288,6 +223,7 @@
     })
   });
 
+  // Test for returning size of maps in kilobytes
   router.get('/sizes', function(req, res){
     BinaryFile.find({}, function(err, binary_refs){
       if(err){
@@ -308,6 +244,7 @@
   });
 
 
+  //  Request a list of all maps by protection level
   router.get('/maps_index', function(req, res){
     permissionLevel = req.query.permission;
     if(!permissionLevel)
@@ -335,48 +272,8 @@
       res.status(200).send(maps_json).end();
     });
   });
-  router.get('/ping', function(req, res) {
-    var file, http, request;
-    console.log(__dirname);
-    BinaryFile.remove(function(err) {
-      var b;
-      if (err) {
-        throw err;
-      }
-      return b = new BinaryFile;
-    });
-    console.log('Starting');
-    http = require('http');
-    file = fs.createWriteStream("./write.jpg");
-    request = http.get("localhost:3000/binary", function(response) {
-      return response.pipe(file);
-    });
-    fs.exists('./sample.jpg', function(fileok) {
-      console.log(fileok);
-      if (fileok) {
-        fs.readFile('./sample.jpg', function(error, data) {
-          var b;
-          b = new BinaryFile;
-          b.binary = data;
-          return b.save;
-        });
-      } else {
-        console.log('file not found');
-      }
-    });
-    console.log('Carry on executing');
-    return res.status(200).send('finished');
-  });
 
-  router.get('/remove_binary', function(req, res){
-    BinaryFile.remove({}, function(err){
-      if(err){
-        console.error(err);
-      }
-      res.status(200).send('All removed');
-    });
-  });
-
+  // Upload a binary file with a specified mapname
   router.post('/upload', function(req, res){
     mapController.upload(req, res);
   });
@@ -441,7 +338,7 @@
     });
   });
 
-  // login user and
+  // login user and display new password form
   router.get('/reset/:token', function(req, res) {
     Account.findOne({ resetPasswordToken: req.params.token, resetPasswordExpiration: { $gt: Date.now() } }, function(err, user) {
       if (!user) {
@@ -457,6 +354,7 @@
     });
   });
 
+  // Post a new password
   router.post('/reset/:token', function(req, res) {
     async.waterfall([
       function(done) {
