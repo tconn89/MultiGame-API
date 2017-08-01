@@ -2,7 +2,7 @@
 
 Docker should be doing most of the heavy lifting for this part.
 
-You'll see in the [DockerFile](DockerFile) that `npm install` is run.  Here is a list of the current node modules as of 8/01/17.  Use `npm ls --depth=0`
+You'll see in the [DockerFile](../DockerFile) that `npm install` is run.  Here is a list of the current node modules as of 8/01/17.  Use `npm ls --depth=0`
 
 ├── async@2.3.0
 ├── axios@0.15.3 extraneous
