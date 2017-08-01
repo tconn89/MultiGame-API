@@ -164,7 +164,7 @@
         session = new Session();
         session.created_at = new Date;
         session.saveSesh(req.session.id, req.user, res, function(){
-          userController.sendVerificationMail(req, function(err){
+          userController.sendVerificationMail(req, req.user, function(err){
             if(err){
               Account.find({ username:req.user.username }).remove().exec();
               res.status(400).send(`${req.user.email} is not a valid email address`);
@@ -175,6 +175,24 @@
         });
       });
     });
+  });
+
+  router.post('/email/resend', function(req, res){
+    Account.findOne({username: req.body.username}, function(err, user){
+      if(err || user == null)
+        res.status(400).send(`Couldn't find email for user: ${req.body.username}`)
+      else{
+        if(user.emailPending){
+          userController.sendVerificationMail(req, user, function(err){
+            if(err)
+              res.status(400).send(`${req.user.email} is not a valid email address`);
+            else
+              res.status(200).send(`Email sent to registered email address of ${req.user.username}`);
+          });
+        } else 
+          res.status(400).send(`${user.username}'s email address has already been verified`);
+      }
+    })
   });
 
   router.get('/email/:token', function(req, res){

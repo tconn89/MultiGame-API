@@ -18,8 +18,7 @@ var auth = {
 }
 var nodemailerMailgun = nodemailer.createTransport(mg(auth));
 
-userController.prototype.sendVerificationMail = function(req, cb) {
-  user = req.user;
+userController.prototype.sendVerificationMail = function(req, user, cb) {
   var mailOptions = {
     to: user.email,
     from: 'verify@terrium.com',
