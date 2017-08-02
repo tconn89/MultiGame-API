@@ -55,36 +55,36 @@ I will answer all endpoint questions in terms of Postman screenshots.
 Replace `localhost:3000` with your domain name ie `example.com`
 
 ### I keep getting no cookie data, you are not unauthorized.  How to fix? 
-    You need to submit a valid session id with each request(not including register or login endpoints).
-    You can get this id from the body of the response from the server after successfully registering or loggin in.
-    Each time you login, you get a new session id.
+You need to submit a valid session id with each request(not including register or login endpoints).
+You can get this id from the body of the response from the server after successfully registering or loggin in.
+Each time you login, you get a new session id.
 
-    ![Session](docs/images/session.png)
+![Session](docs/images/session.png)
 
 ### How do I register users? 
 
-    ![Register](docs/images/register.png)
+![Register](docs/images/register.png)
 
 ### How do I login myUser? 
 
-    ![Login](docs/images/login.png)
+![Login](docs/images/login.png)
 
 ### How do I upload a binary file to store on the server? 
-    Each clientside language is different, but this how Postman does it through their GUI
-    Assign Name of the sushi.jpg binary file to `example`
+Each clientside language is different, but this how Postman does it through their GUI
+Assign Name of the sushi.jpg binary file to `example`
 
-    ![Upload](docs/images/upload.png)
+![Upload](docs/images/upload.png)
 
 ### How do I download a binary file by name? 
-    Request binary file named `example`
+Request binary file named `example`
 
-    ![Download](docs/images/download.png)
+![Download](docs/images/download.png)
 
 ### Where is the database config file? 
-    See the [configuration README](docs/configuration.md)
+See the [configuration README](docs/configuration.md)
 
 ###  What dependencies / packages do I need to install to set up the Node server on a new instance? 
-    See [Install Instructions](docs/install.md).  Basically Install docker and docker should do everything for you.  You may have to debug any problems that arise from the Docker bot.
+See [Install Instructions](docs/install.md).  Basically Install docker and docker should do everything for you.  You may have to debug any problems that arise from the Docker bot.
 
 ###  How do I access the Docker instance of the node server? 
-    ssh into your host server then run `docker exec -it <container_name> /bin/bash`.  In my case, the `<container_name>` is called `pensive_edison`.
+ssh into your host server then run `docker exec -it <container_name> /bin/bash`.  In my case, the `<container_name>` is called `pensive_edison`.
