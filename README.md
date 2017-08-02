@@ -55,17 +55,17 @@ I will answer all endpoint questions in terms of Postman screenshots.
 Replace `localhost:3000` with your domain name ie `example.com`
 
 1) How do I register users?
-    ![alt Register](doc/images/register.png)
+    ![Register](docs/images/register.png)
 
 2) How do I login myUser?
-    ![alt Login](doc/images/login.png)
+    ![Login](docs/images/login.png)
 
 3) How do I upload a binary file to store on the server?
-    ![alt Upload](doc/images/download.png)
+    ![Upload](docs/images/download.png)
 
 4) How do I download a binary file by name?
     Name of binary file is `example`
-    ![alt Download](doc/images/download.png)
+    ![Download](docs/images/download.png)
 
 5) Where is the database config file?
     See the [configuration README](docs/configuration.md)
