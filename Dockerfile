@@ -81,7 +81,7 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards c
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
-CMD ["mongod"]
+CMD ["mongod --config /var/www/node_server/mongo.conf"]
 
 # Install app dependencies
 COPY package.json /var/www/node_server
