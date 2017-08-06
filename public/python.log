@@ -1,0 +1,254 @@
+Hello World
+after 2 seconds
+after 4 seconds
+LOG OUTPUT: 
+ Hello World
+after 2 seconds
+after 4 seconds
+LOG OUTPUT: Sat Aug 05 2017 19:28:13 GMT-0400 (EDT)
+Hello World
+after 2 seconds
+after 4 seconds
+LOG OUTPUT: Sat Aug 05 2017 19:35:30 GMT-0400 (EDT)
+1.10.0
+Found and verified text8.zip
+Data size 17005207
+Most common words (+UNK) [['UNK', 418391], ('the', 1061396), ('of', 593677), ('and', 416629), ('one', 411764)]
+Sample data [5239, 3084, 12, 6, 195, 2, 3137, 46, 59, 156] ['anarchism', 'originated', 'as', 'a', 'term', 'of', 'abuse', 'first', 'used', 'against']
+3084 originated -> 5239 anarchism
+3084 originated -> 12 as
+12 as -> 3084 originated
+12 as -> 6 a
+6 a -> 195 term
+6 a -> 12 as
+195 term -> 2 of
+195 term -> 6 a
+Initialized
+Average loss at step  0 :  292.612792969
+Nearest to over: pure, removable, laws, temmu, serviced, escalation, oberlin, efforts,
+Nearest to were: compromises, moyers, politico, sza, falsification, pat, stench, belligerent,
+Nearest to other: lottery, premiere, ffg, restriction, infertility, god, sonja, parchment,
+Nearest to four: mergesort, serbs, publique, limestones, bailiff, captured, irda, spliced,
+Nearest to all: millet, anxious, hippocrates, engraved, today, blatantly, technically, qd,
+Nearest to of: bags, silicone, soriano, frequentist, robes, novello, conducted, gyms,
+Nearest to no: attaining, ride, repositories, samos, dispersal, dome, ciii, afp,
+Nearest to the: piers, bertolt, cretan, raisonn, december, recipient, compaor, shrewsbury,
+Nearest to system: street, stouffer, manichaeism, gegen, upheaval, airliners, designates, adequate,
+Nearest to after: stitch, celtic, affidavit, swedes, deeper, zout, drinking, remediation,
+Nearest to up: dandy, exilic, keeshonden, basilides, brahma, laes, ingestion, revue,
+Nearest to he: decker, excelled, contamination, naka, gluck, horizonte, hepatitis, replacement,
+Nearest to some: lambar, krajina, ifs, escaping, protein, antiprotons, seventeenth, overwhelmingly,
+Nearest to also: novellas, soap, secam, chydenius, slashdot, curving, mab, khwarizmi,
+Nearest to called: packages, ferguson, hush, bankrupt, premises, acts, hosokawa, ceiling,
+Nearest to th: nabataean, recur, sacagawea, cypress, ottomans, aerosol, scaled, offensive,
+Average loss at step  2000 :  114.136889886
+Average loss at step  4000 :  52.6340242538
+Average loss at step  6000 :  32.8105656257
+Average loss at step  8000 :  23.6110167654
+Average loss at step  10000 :  17.6496609188
+Nearest to over: pure, laws, vs, efforts, auteur, wimbledon, cu, abbas,
+Nearest to were: phylum, are, again, mixtures, asian, alabama, compromises, indiana,
+Nearest to other: natural, god, xi, some, remnants, lymphoma, vertical, mortal,
+Nearest to four: eight, nine, one, earlier, six, coke, three, zero,
+Nearest to all: altenberg, introducing, today, drove, anxious, acknowledging, vowels, ethane,
+Nearest to of: in, and, for, during, vs, omnibus, the, to,
+Nearest to no: ride, aberdeenshire, attaining, lesser, fm, goths, dome, ratio,
+Nearest to the: a, an, coke, vs, agave, one, his, and,
+Nearest to system: street, horch, cl, reform, agave, hymns, phi, atlas,
+Nearest to after: celtic, fallen, affidavit, reaction, fao, hercule, grande, transfinite,
+Nearest to up: toad, inventors, qf, technology, october, faq, poet, repel,
+Nearest to he: qi, it, gang, hepatitis, zar, poet, powerful, replacement,
+Nearest to some: lambar, a, maiden, these, whose, they, bckgr, other,
+Nearest to also: soap, forth, wherein, vs, nearly, marple, criminality, roger,
+Nearest to called: chloroplasts, cousin, packages, bankrupt, dynamite, omnibus, found, moses,
+Nearest to th: cypress, zero, nine, seven, offensive, ottomans, isbn, finalist,
+Average loss at step  12000 :  13.732065469
+Average loss at step  14000 :  11.8696546304
+Average loss at step  16000 :  9.85100430667
+Average loss at step  18000 :  8.56372555757
+Average loss at step  20000 :  8.02400525379
+Nearest to over: pure, cu, laws, efforts, abbas, dasyprocta, operatorname, align,
+Nearest to were: are, phylum, is, was, and, had, mixtures, marco,
+Nearest to other: some, vertical, god, sort, natural, remnants, xi, dasyprocta,
+Nearest to four: six, eight, five, nine, zero, three, two, one,
+Nearest to all: introducing, altenberg, fricative, drove, most, anxious, dasyprocta, cain,
+Nearest to of: and, in, for, during, agouti, nine, zero, with,
+Nearest to no: samos, aberdeenshire, ride, attaining, which, goths, statesman, the,
+Nearest to the: a, his, one, its, agouti, dasyprocta, agave, this,
+Nearest to system: street, hymns, coa, dasyprocta, agave, circ, reform, horch,
+Nearest to after: celtic, fallen, dasyprocta, and, for, swedes, designs, first,
+Nearest to up: brahma, circ, agouti, toad, inventors, acapulco, qf, repel,
+Nearest to he: it, there, and, who, six, she, nonstandard, circ,
+Nearest to some: many, the, these, lambar, two, maiden, other, a,
+Nearest to also: ulyanov, forth, soap, carina, wherein, who, nearly, agouti,
+Nearest to called: cousin, bankrupt, packages, about, chloroplasts, found, dynamite, mixes,
+Nearest to th: eight, seven, cypress, zero, ottomans, six, nine, offensive,
+Average loss at step  22000 :  7.18246225595
+Average loss at step  24000 :  6.79460485435
+Average loss at step  26000 :  6.80448895979
+Average loss at step  28000 :  6.38954141355
+Average loss at step  30000 :  5.9411229285
+Nearest to over: pure, cu, laws, conscientious, dasyprocta, six, abbas, ultrasound,
+Nearest to were: are, was, phylum, is, by, had, and, mixtures,
+Nearest to other: some, sort, vertical, natural, remnants, several, sonja, lottery,
+Nearest to four: six, five, eight, three, two, seven, nine, zero,
+Nearest to all: introducing, sponsors, altenberg, drove, most, fricative, anxious, some,
+Nearest to of: in, and, for, during, agouti, eight, nine, abet,
+Nearest to no: samos, it, which, ride, aberdeenshire, eventually, goths, statesman,
+Nearest to the: its, a, this, his, agave, agouti, dasyprocta, abet,
+Nearest to system: hymns, street, coa, agave, dasyprocta, manichaeism, agouti, reform,
+Nearest to after: celtic, fallen, in, for, dasyprocta, four, designs, swedes,
+Nearest to up: circ, agouti, exilic, brahma, him, toad, inventors, acapulco,
+Nearest to he: it, there, who, she, they, six, francorum, circ,
+Nearest to some: many, these, the, other, their, whose, maiden, they,
+Nearest to also: ulyanov, who, carina, often, agouti, forth, that, soap,
+Nearest to called: bankrupt, cousin, packages, about, found, mistral, accountant, dynamite,
+Nearest to th: seven, eight, zero, cypress, ottomans, recur, six, nabataean,
+Average loss at step  32000 :  5.95281744397
+Average loss at step  34000 :  5.68441757917
+Average loss at step  36000 :  5.76529260123
+Average loss at step  38000 :  5.47209094036
+Average loss at step  40000 :  5.24469545865
+Nearest to over: pure, laws, six, four, cu, zero, ultrasound, conscientious,
+Nearest to were: are, was, phylum, had, is, by, have, be,
+Nearest to other: some, several, lottery, natural, dasyprocta, sort, bckgr, glover,
+Nearest to four: six, five, eight, three, zero, seven, two, one,
+Nearest to all: some, most, introducing, millet, altenberg, sponsors, drove, fricative,
+Nearest to of: zero, in, for, and, agouti, during, eight, abet,
+Nearest to no: samos, which, it, akita, ride, eventually, malory, albury,
+Nearest to the: its, zero, their, dasyprocta, his, agouti, this, abet,
+Nearest to system: hymns, coa, agave, manichaeism, street, reform, dasyprocta, problem,
+Nearest to after: fallen, four, stitch, celtic, in, dasyprocta, zero, for,
+Nearest to up: tomcats, him, circ, exilic, agouti, brahma, acapulco, revue,
+Nearest to he: it, she, who, there, they, aveiro, zero, six,
+Nearest to some: many, these, all, their, other, the, zero, kifl,
+Nearest to also: often, who, ulyanov, carina, zero, which, agouti, it,
+Nearest to called: bankrupt, cousin, packages, about, mistral, found, dynamite, accountant,
+Nearest to th: seven, eight, six, zero, nine, cypress, ottomans, recur,
+Average loss at step  42000 :  5.4064471482
+Average loss at step  44000 :  5.25755576706
+Average loss at step  46000 :  5.22411512566
+Average loss at step  48000 :  5.24148258698
+Average loss at step  50000 :  4.99335282302
+Nearest to over: pure, four, laws, dasyprocta, operatorname, cu, ultrasound, seconds,
+Nearest to were: are, was, had, phylum, is, have, be, by,
+Nearest to other: some, several, many, glover, bckgr, natural, dasyprocta, two,
+Nearest to four: six, three, five, eigLOG OUTPUT: Sat Aug 05 2017 19:37:00 GMT-0400 (EDT)
+ht, seven, two, one, zero,
+Nearest to all: some, introducing, these, most, two, millet, altenberg, dasyprocta,
+Nearest to of: in, for, agouti, eight, renarrative, seven, during, and,
+Nearest to no: samos, akita, it, ride, which, eventually, malory, statesman,
+Nearest to the: their, its, his, a, abet, this, dasyprocta, agouti,
+Nearest to system: hymns, coa, agave, reform, street, problem, manichaeism, atlas,
+Nearest to after: four, fallen, six, stitch, celtic, dasyprocta, in, for,
+Nearest to up: him, tomcats, circ, exilic, agouti, brahma, sox, beeb,
+Nearest to he: it, she, they, who, there, aveiro, six, francorum,
+Nearest to some: many, these, all, other, the, franchisee, this, their,
+Nearest to also: often, still, which, who, it, not, now, agouti,
+Nearest to called: packages, found, mistral, bankrupt, cousin, accountant, and, about,
+Nearest to th: seven, six, eight, five, four, cypress, recur, ottomans,
+Average loss at step  52000 :  5.02689310765
+Average loss at step  54000 :  5.1857837373
+Average loss at step  56000 :  5.06212414443
+Average loss at step  58000 :  5.04051073539
+Average loss at step  60000 :  4.92667554605
+Nearest to over: pure, six, four, dasyprocta, laws, operatorname, around, seconds,
+Nearest to were: are, was, had, have, phylum, be, by, is,
+Nearest to other: some, pulau, many, several, two, bckgr, microsite, these,
+Nearest to four: five, six, eight, three, seven, nine, two, zero,
+Nearest to all: some, introducing, these, three, two, most, altenberg, millet,
+Nearest to of: in, nine, for, and, renarrative, seven, during, agouti,
+Nearest to no: samos, akita, straczynski, it, malory, eventually, albury, abilene,
+Nearest to the: its, their, abet, dasyprocta, coke, agouti, agave, this,
+Nearest to system: hymns, coa, agave, problem, reform, atlas, street, manichaeism,
+Nearest to after: six, fallen, four, dasyprocta, stitch, during, seven, celtic,
+Nearest to up: him, tomcats, circ, exilic, brahma, sox, agouti, revue,
+Nearest to he: it, she, they, who, there, aveiro, packers, kylix,
+Nearest to some: many, these, other, all, their, the, franchisee, this,
+Nearest to also: often, which, still, who, it, now, agouti, then,
+Nearest to called: packages, bankrupt, acetaldehyde, mistral, found, accountant, cousin, bang,
+Nearest to th: eight, six, five, seven, four, zero, nine, cypress,
+Average loss at step  62000 :  5.01796365595
+Average loss at step  64000 :  4.83697885668
+Average loss at step  66000 :  4.61674526894
+Average loss at step  68000 :  4.9625949074
+Average loss at step  70000 :  4.90818068266
+Nearest to over: pure, around, four, dasyprocta, laws, operatorname, ultrasound, seconds,
+Nearest to were: are, was, have, had, phylum, be, cebus, inflict,
+Nearest to other: some, many, pulau, several, bckgr, mico, these, microsite,
+Nearest to four: five, six, three, eight, seven, two, nine, zero,
+Nearest to all: some, these, introducing, altenberg, many, most, traction, mico,
+Nearest to of: and, for, renarrative, agouti, in, mico, during, dasyprocta,
+Nearest to no: samos, akita, straczynski, albury, statesman, abilene, dist, fadh,
+Nearest to the: their, its, his, this, a, dasyprocta, abet, agouti,
+Nearest to system: hymns, systems, problem, hagbard, reform, agave, coa, atlas,
+Nearest to after: during, fallen, dasyprocta, in, when, stitch, celtic, before,
+Nearest to up: him, tomcats, circ, brahma, exilic, sox, agouti, them,
+Nearest to he: it, she, they, who, there, aveiro, packers, kylix,
+Nearest to some: many, these, other, all, the, their, franchisee, this,
+Nearest to also: often, still, which, now, who, it, agouti, unassigned,
+Nearest to called: packages, mistral, acetaldehyde, found, bankrupt, accountant, cousin, dynamite,
+Nearest to th: eight, six, five, nine, seven, recur, four, cypress,
+Average loss at step  72000 :  4.75030258965
+Average loss at step  74000 :  4.80347334874
+Average loss at step  76000 :  4.73278815413
+Average loss at step  78000 :  4.79830855256
+Average loss at step  80000 :  4.80861588681
+Nearest to over: pure, around, four, heterochromatin, dasyprocta, laws, operatorname, ultrasound,
+Nearest to were: are, was, had, have, be, phylum, by, cebus,
+Nearest to other: some, many, several, pulau, bckgr, two, mico, microsite,
+Nearest to four: five, six, seven, three, eight, nine, two, zero,
+Nearest to all: some, these, many, introducing, various, two, millet, traction,
+Nearest to of: in, renarrative, agouti, iit, including, for, circ, nine,
+Nearest to no: samos, akita, it, iit, obstinate, straczynski, fadh, albury,
+Nearest to the: their, its, a, dasyprocta, pulau, albury, agouti, six,
+Nearest to system: hymns, systems, problem, hagbard, reform, agave, atlas, mae,
+Nearest to after: during, fallen, before, when, following, dasyprocta, stitch, four,
+Nearest to up: him, tomcats, out, exilic, brahma, them, circ, down,
+Nearest to he: it, she, they, who, there, aveiro, packers, kylix,
+Nearest to some: many, these, all, other, their, franchisee, most, several,
+Nearest to also: often, still, which, now, it, sometimes, agouti, unassigned,
+Nearest to called: packages, mistral, acetaldehyde, bankrupt, and, accountant, cousin, dissonant,
+Nearest to th: eight, seven, five, six, nine, four, recur, cypress,
+Average loss at step  82000 :  4.76485995436
+Average loss at step  84000 :  4.75441792834
+Average loss at step  86000 :  4.77018181288
+Average loss at step  88000 :  4.75369319332
+Average loss at step  90000 :  4.7317345711
+Nearest to over: around, pure, heterochromatin, dasyprocta, seconds, laws, ultrasound, peacocks,
+Nearest to were: are, was, have, had, be, phylum, by, cebus,
+Nearest to other: some, many, several, bckgr, pulau, two, including, mico,
+Nearest to four: five, three, seven, eight, six, two, nine, one,
+Nearest to all: some, these, many, introducing, two, various, traction, mico,
+Nearest to of: including, in, iit, agouti, for, renarrative, globemaster, eight,
+Nearest to no: samos, any, akita, obstinate, fadh, it, another, iit,
+Nearest to the: its, their, a, his, this, peacocks, dasyprocta, abet,
+Nearest to system: systems, hymns, problem, hagbard, agave, reform, atlas, agouti,
+Nearest to after: during, before, when, fallen, following, dasyprocta, seven, stitch,
+Nearest to up: him, out, down, tomcats, them, circ, revue, brahma,
+Nearest to he: it, she, they, there, who, aveiro, packers, zero,
+Nearest to some: many, these, all, other, the, several, their, this,
+Nearest to also: often, still, now, which, sometimes, never, originally, not,
+Nearest to called: packages, and, mistral, acetaldehyde, bankrupt, accountant, UNK, found,
+Nearest to th: eight, seven, five, nine, six, four, recur, cypress,
+Average loss at step  92000 :  4.67153251278
+Average loss at step  94000 :  4.72458775139
+Average loss at step  96000 :  4.69338895786
+Average loss at step  98000 :  4.60115195727
+Average loss at step  100000 :  4.70593235075
+Nearest to over: around, pure, dasyprocta, laws, operatorname, heterochromatin, crt, peacocks,
+Nearest to were: are, have, had, was, be, phylum, cebus, is,
+Nearest to other: some, many, several, bckgr, including, pulau, various, mico,
+Nearest to four: five, seven, eight, three, six, two, zero, nine,
+Nearest to all: some, many, these, various, introducing, two, traction, millet,
+Nearest to of: in, iit, agouti, eight, including, during, renarrative, for,
+Nearest to no: any, samos, akita, obstinate, nine, albury, abilene, iit,
+Nearest to the: its, their, his, peacocks, a, dasyprocta, agouti, abet,
+Nearest to system: systems, problem, hymns, agave, hagbard, reform, atlas, slots,
+Nearest to after: during, before, when, fallen, following, in, dasyprocta, stitch,
+Nearest to up: him, out, down, tomcats, them, brahma, revue, circ,
+Nearest to he: it, she, they, there, who, aveiro, packers, kylix,
+Nearest to some: many, these, all, several, this, other, their, the,
+Nearest to also: often, still, now, which, sometimes, never, who, it,
+Nearest to called: packages, mistral, and, castel, accountant, badgers, dissonant, acetaldehyde,
+Nearest to th: nine, five, seven, eight, four, recur, six, cypress,

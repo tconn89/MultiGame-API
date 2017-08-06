@@ -23,6 +23,7 @@
   flash = require('connect-flash');
 
   routes = require('./routes/index');
+  python_routes = require('./routes/python.js');
 
   users = require('./routes/users');
 
@@ -121,6 +122,7 @@ localAuthentication = function(req, res, next){
   app.use(mapPermission.isAllowed);
 
   app.use('/', routes);
+  app.use('/python', python_routes);
 
   Account = require('./models/account');
 

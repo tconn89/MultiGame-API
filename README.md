@@ -33,7 +33,7 @@ newgrp docker
 ```
 ```bash
 docker build -t nodegameserver .
-docker run -i -t -p 49160:3000 -d nodegameserver
+docker run -i -t -p 80:3000 -d nodegameserver
 ```
 
 ## check for running image -- you should see one item in the list
@@ -41,7 +41,7 @@ docker run -i -t -p 49160:3000 -d nodegameserver
 docker ps
 ```
 
-## check your browser for server dns or ip address on port 49160
+## check your browser for server dns or ip address on port 80
 You should see an unauthorized response from the server, so its working.
 
 ## Go inside the Docker container
