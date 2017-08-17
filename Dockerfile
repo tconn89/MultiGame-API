@@ -61,7 +61,6 @@ RUN echo "deb http://$MONGO_REPO/apt/debian jessie/${MONGO_PACKAGE%-unstable}/$M
 
 RUN set -x \
   && apt-get update \
-  && apt-get install cron \
   && apt-get install -y \
     ${MONGO_PACKAGE}=$MONGO_VERSION \
     ${MONGO_PACKAGE}-server=$MONGO_VERSION \
@@ -78,10 +77,10 @@ VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
-ENTRYPOINT ["docker-entrypoint.sh"]
+# ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
-CMD ["mongod --config /var/www/node_server/mongo.conf"]
+# CMD ["mongod --config /var/www/node_server/mongo.conf"]
 
 # Install app dependencies
 COPY package.json /var/www/node_server
@@ -93,7 +92,7 @@ COPY . /var/www/node_server
 
 EXPOSE 3000
 RUN mkdir /var/www/node_server/log
-RUN FOREVER_ROOT="/var/www/node_server" forever start bin/server.js
+# RUN FOREVER_ROOT="/var/www/node_server" forever start bin/server.js
 
 # CMD ["bin/bash"]
 # CMD [ "npm", "run-script", "mongo_start" ]
