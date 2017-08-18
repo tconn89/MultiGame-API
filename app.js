@@ -24,6 +24,7 @@
 
   routes = require('./routes/index');
   python_routes = require('./routes/python.js');
+  db_reader = require('./routes/db_reader.js')
 
   users = require('./routes/users');
 
@@ -123,6 +124,7 @@ localAuthentication = function(req, res, next){
 
   app.use('/', routes);
   app.use('/python', python_routes);
+  app.use('/db', db_reader);
 
   Account = require('./models/account');
 
