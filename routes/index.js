@@ -104,7 +104,7 @@
               res.status(400).send(`${req.user.email} is not a valid email address.`);
             }
             else
-              res.status(200).send(`Email sent to ${req.user.email}. Please verify before proceeding`);
+              res.status(200).send(`Email sent to ${req.user.email}. Please verify before proceeding.`);
           });
         });
       });
