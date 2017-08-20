@@ -1,0 +1,14 @@
+div
+  table
+    thead
+      tr: th Posts
+    tbody
+      each user, i in users
+        tr(class=(i % 2 == 0) ? 'odd' : 'even') 
+          td
+            a(href='/admin/post/') #{user}
+
+style(type='text/css').
+  .odd {
+      background: tomato;
+  }

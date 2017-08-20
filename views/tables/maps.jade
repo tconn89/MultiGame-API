@@ -1,0 +1,18 @@
+div
+  table
+    thead
+      tr
+        th Name
+        th Create Date
+    tbody
+      each map, i in maps
+        tr(class=(i % 2 == 0) ? 'odd' : 'even') 
+          td
+            p #{map.map_name}
+          td
+            p #{map.created_at}
+
+style(type='text/css').
+  .odd {
+      background: #575757;
+  }
