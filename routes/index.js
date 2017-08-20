@@ -380,8 +380,8 @@
           from: 'passwordreset@knsd-tools.com',
           subject: 'On-Demand Editor Scheduling App',
           text: 'Hello,\n\n' +
-            'This message confirms your password change for the account ' + user.email + '. Please
-            contact an administrator if this is in error.\n'
+            'This message confirms your password change for the account ' + user.email +
+            '. Please contact an administrator if this is in error.\n'
         };
         nodemailerMailgun.sendMail(mailOptions, (err, info) => {
           if(err)
