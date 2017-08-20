@@ -21,8 +21,8 @@ var nodemailerMailgun = nodemailer.createTransport(mg(auth));
 userController.prototype.sendVerificationMail = function(req, user, cb) {
   var mailOptions = {
     to: user.email,
-    from: 'verify@terrium.com',
-    subject: 'Terrium Email Verificaton',
+    from: 'verify@knsd-tools.com',
+    subject: 'On-Demand Editor Scheduling App Verificaton',
     text: 
       `Hello ${user.username}! \n` +
       'Please click this link to verify your email address: \n' +

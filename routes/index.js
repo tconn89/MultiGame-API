@@ -101,10 +101,10 @@
           userController.sendVerificationMail(req, req.user, function(err){
             if(err){
               Account.find({ username:req.user.username }).remove().exec();
-              res.status(400).send(`${req.user.email} is not a valid email address`);
+              res.status(400).send(`${req.user.email} is not a valid email address.`);
             }
             else
-              res.status(200).send(`Email sent to ${req.user.email}, please verify before proceeding`);
+              res.status(200).send(`Email sent to ${req.user.email}. Please verify before proceeding`);
           });
         });
       });
@@ -115,17 +115,17 @@
   router.post('/email/resend', function(req, res){
     Account.findOne({username: req.body.username}, function(err, user){
       if(err || user == null)
-        res.status(400).send(`Couldn't find email for user: ${req.body.username}`)
+        res.status(400).send(`Could not find email for user: ${req.body.username}.`)
       else{
         if(user.emailPending){
           userController.sendVerificationMail(req, user, function(err){
             if(err)
-              res.status(400).send(`${req.user.email} is not a valid email address`);
+              res.status(400).send(`${req.user.email} is not a valid email address.`);
             else
-              res.status(200).send(`Email sent to registered email address of ${req.user.username}`);
+              res.status(200).send(`Email sent to registered email address of ${req.user.username}.`);
           });
         } else 
-          res.status(400).send(`${user.username}'s email address has already been verified`);
+          res.status(400).send(`${user.username}'s email address has already been verified.`);
       }
     })
   });
@@ -158,12 +158,12 @@
     failureFlash: true
   }), function(req, res, next) {
     if(req.user.emailPending)
-      return res.status(400).send('User has not verified their email address');
+      return res.status(400).send('User has not verified their email address.');
     Session.findOne({user_id: req.user.id}, function(err, session){
       if(err)
         console.error(err);
       if(!session){
-        console.error('this should never happen')
+        console.error('This should never happen.')
       }
       return session.saveSesh(req.session.id, req.user, res);
     });
@@ -300,7 +300,7 @@
       function(token, done) {
         Account.findOne({ email: req.body.email }, function(err, user) {
           if (!user) {
-            return res.status(400).send({message: 'No account with that email address exists'});
+            return res.status(400).send({message: 'No account with that email address exists.'});
           }
 
           user.resetPasswordToken = token;
@@ -316,7 +316,7 @@
           to: user.email,
           from: 'passwordreset@demo.com',
           subject: 'Node.js Password Reset',
-          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          text: 'You are receiving this because you (or someone else) have requested to reset the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
             'http://' + req.headers.host + '/reset/' + token + '\n\n' +
             'If you did not request this, please ignore this email and your password will remain unchanged.\n'
@@ -334,7 +334,7 @@
       }
     ], function(err) {
       if (err) return next(err);
-      res.send({message: 'Your password reset email has been sent'});
+      res.send({message: 'Your password reset email has been sent.'});
     });
   });
 
@@ -342,7 +342,7 @@
   router.get('/reset/:token', function(req, res) {
     Account.findOne({ resetPasswordToken: req.params.token, resetPasswordExpiration: { $gt: Date.now() } }, function(err, user) {
       if (!user) {
-        return res.status(401).send({message: 'Password reset token is invalid or has expired'});
+        return res.status(401).send({message: 'Password reset token is invalid or has expired.'});
       }
       Session.findOne({user_id: user.id}, (err, session) => {
         if(err)
@@ -377,10 +377,11 @@
       function(user, done) {
         var mailOptions = {
           to: user.email,
-          from: 'passwordreset@terrium.com',
-          subject: 'Your password has been changed',
+          from: 'passwordreset@knsd-tools.com',
+          subject: 'On-Demand Editor Scheduling App',
           text: 'Hello,\n\n' +
-            'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+            'This message confirms your password change for the account ' + user.email + '. Please
+            contact an administrator if this is in error.\n'
         };
         nodemailerMailgun.sendMail(mailOptions, (err, info) => {
           if(err)
@@ -392,7 +393,7 @@
     ], function(err) {
       if(err)
         console.error(err);
-      res.send({message: 'password update email successfully sent'});
+      res.send({message: 'Password update email sent successfully.'});
     });
   });
 

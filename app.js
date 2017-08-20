@@ -42,7 +42,7 @@ localAuthentication = function(req, res, next){
     return next();
   }
   if(!req.session){
-    return res.send('session undefined, you are not authorized');
+    return res.send('Session undefined. You are not authorized.');
   }
 
   var my_cookie;
@@ -55,7 +55,7 @@ localAuthentication = function(req, res, next){
   else if(req.body.my_cookie)
     my_cookie = req.body.my_cookie.split(',');
   else
-    return res.status(401).send('no cookie data, you are not authorized')
+    return res.status(401).send('No cookie data. You are not authorized.')
 
   Session.findOne({secret: my_cookie[0]}, function(err,db_sesh){
     if(err)
@@ -63,7 +63,7 @@ localAuthentication = function(req, res, next){
     if(db_sesh){
       // measured in milli seconds expires in 1 hour
       if(db_sesh.updated_at - new Date > (60 * 60 * 1000))
-        return res.status(401).send('expired session, plz login');
+        return res.status(401).send('Expired session. Please log in.');
 
       Account.findOne({id: db_sesh.user_id}, function(err, user){
         if(err)
@@ -73,11 +73,11 @@ localAuthentication = function(req, res, next){
           next();
         }
         else
-          return res.status(401).send('anonymous session, you are not authorized')
+          return res.status(401).send('Anonymous session. You are not authorized.')
       });
     }
     else
-      return res.status(401).send('no session on record, you are not authorized')
+      return res.status(401).send('No session on record. You are not authorized.')
   });
 }
 
