@@ -32,7 +32,7 @@
 //  local_authentication = require('./config/local_authentication')
 localAuthentication = function(req, res, next){
   console.log('authenticating..');
-  if(req.url == '/login' || req.url == '/register' || req.url == '/forgot' || req.url == '/email/resend'){
+  if(req.url == '/login' || req.url == '/register' || req.url == '/recover' || req.url == '/forgot' || req.url == '/email/resend'){
     return next();
   }
   // email token verification omitted

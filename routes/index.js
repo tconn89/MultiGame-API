@@ -139,10 +139,13 @@
         if(err)
           console.error(err);
       })
-      return res.status(200).send(`email verified, ${user.username} may login now`);
+      return res.status(200).send(`Email verified. ${user.username} may login now.`);
     });
   });
-
+  
+  router.get('/recover', function(req, res) {
+    res.render('recover');
+  });
 
   // why does this work?
   router.get('/login', function(req, res) {
