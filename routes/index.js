@@ -68,6 +68,11 @@
     });
 
   });
+  router.post('/remove', function(req, res){
+    BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
+      res.status(m_status).send({message: m_message});
+    })
+  })
   // Send user registration credentials to server
   router.post('/register', function(req, res, next) {
     username = req.body.username;
