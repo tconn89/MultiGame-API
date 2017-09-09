@@ -68,9 +68,24 @@
     });
 
   });
-  router.post('/remove', function(req, res){
+  // Temporary endpoint until we have roles
+  router.post('/admin/remove', function(req, res){
     BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
       res.status(m_status).send({message: m_message});
+    })
+  });
+
+  router.post('/map/remove', function(req, res){
+    _map_name = req.body.map_name
+    _user = req.user
+    BinaryFile.findOne({map_name: _map_name}, function(err, map){
+      if(map.user_id == _user.id){
+        BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
+          res.status(m_status).send({message: m_message});
+        })
+      }
+      else
+        res.status(401).send({message: `${_user.username} cannot destroy ${_map_name}; They do not own that map.`})
     })
   })
   // Send user registration credentials to server
