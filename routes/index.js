@@ -133,7 +133,7 @@
 
   // Resend Verification Email
   router.post('/email/resend', function(req, res){
-    Account.findOne({username: req.body.email}, function(err, user){
+    Account.findOne({email: req.body.email}, function(err, user){
       if(err || user == null)
         res.status(400).send(`Couldn't find email for user: ${req.body.username}`)
       else{
