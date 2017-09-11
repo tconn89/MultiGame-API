@@ -101,30 +101,41 @@
     }
     token = crypto.randomBytes(20).toString('hex');
     console.log(`token ${token}`);
-    return Account.register(new Account({
-      username: username,
-      email: email,
-      emailToken: token,
-      emailPending: true,
-      created_at: new Date
-    }), req.body.password, function(err, account) {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      return passport.authenticate('local')(req, res, function() {
-        req.session.cookie.maxAge = 3600000;
-        // do not duplicate in db sessions
-        // need to be async
-        session = new Session();
-        session.created_at = new Date;
-        session.saveSesh(req.session.id, req.user, res, function(){
-          userController.sendVerificationMail(req, req.user, function(err){
-            if(err){
-              Account.find({ username:req.user.username }).remove().exec();
-              res.status(400).send(`${req.user.email} is not a valid email address`);
-            }
-            else
-              res.status(200).send(`Email sent to ${req.user.email}, please verify before proceeding`);
+    async.waterfall([function(done){
+      // email duplicate check
+      Account.findOne({email: email}, function(err, user){
+        if(err)
+          console.error(err);
+        if(user)
+          return res.status(400).send("User already exists with the email");
+        done('done')
+      })
+    }], function(){
+      Account.register(new Account({
+        username: username,
+        email: email,
+        emailToken: token,
+        emailPending: true,
+        created_at: new Date
+      }), req.body.password, function(err, account) {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        return passport.authenticate('local')(req, res, function() {
+          req.session.cookie.maxAge = 3600000;
+          // do not duplicate in db sessions
+          // need to be async
+          session = new Session();
+          session.created_at = new Date;
+          session.saveSesh(req.session.id, req.user, res, function(){
+            userController.sendVerificationMail(req, req.user, function(err){
+              if(err){
+                Account.find({ username:req.user.username }).remove().exec();
+                res.status(400).send(`${req.user.email} is not a valid email address`);
+              }
+              else
+                res.status(200).send(`Email sent to ${req.user.email}, please verify before proceeding`);
+            });
           });
         });
       });
