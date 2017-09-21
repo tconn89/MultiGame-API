@@ -162,9 +162,9 @@
         if(user.emailPending){
           userController.sendVerificationMail(req, user, function(err){
             if(err)
-              res.status(400).send(`${req.user.email} is not a valid email address`);
+              res.status(400).send(`${user.email} is not a valid email address`);
             else
-              res.status(200).send(`Email sent to registered email address of ${req.user.username}`);
+              res.status(200).send(`Email sent to registered email address of ${user.username}`);
           });
         } else 
           res.status(400).send(`${user.username}'s email address has already been verified`);
