@@ -10,7 +10,10 @@ router.get('/users', function(req, res){
         result = Object.keys(users).reduce(function (previous, key) {
             return previous + '\n' + users[key];
         }, 0);
-        res.send(result);
+        m_keys = Object.keys(Account.schema.paths).filter(function(elem){
+            return elem != 'emailToken' && elem != '_id'
+        })
+        res.render('dbTable', { myUsers: users, keys: m_keys } );
     })
 });
 

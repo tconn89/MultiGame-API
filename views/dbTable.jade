@@ -1,0 +1,10 @@
+html
+  body
+    table
+      tr
+      for key in keys
+        th #{key}
+      for user in myUsers
+        tr
+          for key in keys
+            td #{user[key]}
