@@ -9,4 +9,4 @@
 node_modules
 *.out
 npm-debug.log
-public/uploads
+public/uploads/

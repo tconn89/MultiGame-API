@@ -69,6 +69,17 @@
 
   });
   // Temporary endpoint until we have roles
+  router.get('/users', function(req,res){
+    Account.find({}, function(err, users){
+      if(err)
+        console.error(err);
+      result = '';
+      users.forEach(function(user){
+        result += user.username + '\n'
+      })
+      res.send(result);
+    });
+  });
   router.post('/admin/remove', function(req, res){
     BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
       res.status(m_status).send({message: m_message});
