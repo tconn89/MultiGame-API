@@ -345,7 +345,7 @@
       function(token, user, done) {
         var mailOptions = {
           to: user.email,
-          from: 'passwordreset@demo.com',
+          from: 'passwordreset@terrium.net',
           subject: 'Node.js Password Reset',
           text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -408,7 +408,7 @@
       function(user, done) {
         var mailOptions = {
           to: user.email,
-          from: 'passwordreset@terrium.com',
+          from: 'passwordreset@terrium.net',
           subject: 'Your password has been changed',
           text: 'Hello,\n\n' +
             'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
