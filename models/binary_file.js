@@ -17,7 +17,8 @@
     user_id: Number,
     created_at: Date,
     updated_at: Date,
-    permission: String
+    permission: String,
+    guest: {type: Boolean, default: false}
   });
   BinaryFile.methods.setPermissionLevel = function(level, callback){
     if(level == 'private'){

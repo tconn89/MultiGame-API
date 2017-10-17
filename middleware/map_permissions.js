@@ -25,7 +25,7 @@ MapPermission.prototype.isAllowed = function(req, res, next){
       console.error(err);
     console.log('Does user own map?');
     //Does map exist?
-    if(!map)
+    if(!map || map.guest)
       return next()
     // if user owns the map, all good -- no logic
     if(isOwner(map, req.user))

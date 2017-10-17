@@ -36,7 +36,7 @@ localAuthentication = function(req, res, next){
     return next();
   }
   // email token verification omitted
-  if(req.url.startsWith('/email'))
+  if(req.url.startsWith('/email') || req.url.startsWith('/guest'))
     return next();
   if(req.url.match(/\/reset\//)){
     return next();

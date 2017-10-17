@@ -53,6 +53,10 @@
     return res.render('register', {});
   });
 
+  router.post('/guest/save', function(req, res){
+    req.query.guest = true;
+    mapController.upload(req, res);    
+  });
   // Change the permission level to Public, Protected, or Private
   router.post('/map_permission_level', function(req, res){
     permissionController.update(req, res, "", function(myRes){
@@ -254,6 +258,9 @@
   router.get('/binary',
     clientBinary
   );
+  router.get('/guest/load',
+    clientBinary
+  );
 
   // Just an idea, not working
   router.get('/redis', function(req, res){
@@ -286,6 +293,26 @@
   });
 
 
+  router.get('/guest/maps', function(req, res){
+    BinaryFile.find({guest: true}, function(err, docs){
+      if(err){
+        throw err;
+      }
+      names = [];
+      i = 0;
+      docs.forEach(function(ref){
+        if(ref.map_name){
+          if(!ref.map_name.endsWith('Terrain'))
+            names.push(ref.map_name);
+        }
+      });
+      maps = {
+        'maps': names
+      }
+      maps_json = JSON.stringify(maps);
+      res.status(200).send(maps_json).end();
+    });
+  });
   //  Request a list of all maps by protection level
   router.get('/maps_index', function(req, res){
     permissionLevel = req.query.permission;
