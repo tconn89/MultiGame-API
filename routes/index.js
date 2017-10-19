@@ -19,6 +19,8 @@
 
   BinaryFile = require('../models/binary_file');
 
+  ActiveDownload = require('../models/active_download');
+
   Session = require('../models/session');
 
   mongoose = require('mongoose');
@@ -30,6 +32,7 @@
 
   PermissionController = require('../controllers/permissions_controller');
   permissionController = new PermissionController();
+
 
   var Schema   = mongoose.Schema;
   var ObjectIdSchema = Schema.ObjectId;
@@ -83,6 +86,20 @@
       })
       res.send(result);
     });
+  });
+  router.get('/progress', function(req, res){
+    ActiveDownload.findOne({hash: req.headers.hash}, function(err, activity){
+      if(err)
+        console.error(err);
+      else{
+        received = activity.current_bytes;
+        expected = activity.expected_bytes;
+        percent = Math.round(100* received / expected)/ 100;
+        res.send({ percentile: percent,
+                   bytesReceived: received,
+                   bytesExpected: expected });
+      }
+    })
   });
   router.post('/admin/remove', function(req, res){
     BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
