@@ -89,7 +89,7 @@
   });
   router.get('/progress', function(req, res){
     _date = new Date();
-    _time = _date.setMinutes(_date.getMinutes()-2);
+    _time = _date.setSeconds(_date.getSeconds()-7);
     ActiveDownload.findOne({user_id: req.headers.id, created_at: {$gte: _time}}, function(err, activity){
       if(err)
         console.error(err);

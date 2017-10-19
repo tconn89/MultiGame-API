@@ -84,13 +84,15 @@ configuredForm = function(req,res, binaryFlag){
       addBinary(my_options);
     })
     .on('progress', function(bytesReceived, bytesExpected) {
-      if(bytesReceived == 0)
+      _percent = Math.round(1000 * bytesReceived / bytesExpected);
+      if(bytesReceived == 0){
         if(req.url.includes('Terrain'))
           AddActiveDownload(req.user,map_name, bytesReceived, bytesExpected, function(hash){
             console.log("Added download activity" + hash.substring(0, 6));
             return res.send(hash);
           });
-      else if(Math.round(10000* bytesReceived / bytesExpected) % 1000 == 0 ){
+      }
+      else if( _percent % 100 == 0 ){
         console.log(mapController.activeHash);
         UpdateDownload(mapController.activeHash, bytesReceived);
       }
