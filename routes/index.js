@@ -88,7 +88,9 @@
     });
   });
   router.get('/progress', function(req, res){
-    ActiveDownload.findOne({hash: req.headers.hash}, function(err, activity){
+    _date = new Date();
+    _time = _date.setMinutes(_date.getMinutes()-2);
+    ActiveDownload.findOne({user_id: req.headers.id, created_at: {$gte: _time}}, function(err, activity){
       if(err)
         console.error(err);
       else{
