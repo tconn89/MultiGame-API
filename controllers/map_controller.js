@@ -85,10 +85,11 @@ configuredForm = function(req,res, binaryFlag){
     })
     .on('progress', function(bytesReceived, bytesExpected) {
       if(bytesReceived == 0)
-        AddActiveDownload(req.user,map_name, bytesReceived, bytesExpected, function(hash){
-          console.log("Added download activity" + hash.substring(0, 6));
-          return res.send(hash);
-        });
+        if(req.url.includes('Terrain'))
+          AddActiveDownload(req.user,map_name, bytesReceived, bytesExpected, function(hash){
+            console.log("Added download activity" + hash.substring(0, 6));
+            return res.send(hash);
+          });
       else if(Math.round(10000* bytesReceived / bytesExpected) % 1000 == 0 ){
         console.log(mapController.activeHash);
         UpdateDownload(mapController.activeHash, bytesReceived);
@@ -128,7 +129,7 @@ AddActiveDownload = function(user, name, received, expected, cb){
 }
 UpdateDownload = function(hash, received){
   _data = { current_bytes: received, updated_at: new Date() };
-  ActiveDownload.findOneAndUpdate({hash: hash}, _data, {upsert: true}, function(err, activity){
+  ActiveDownload.findOneAndUpdate({hash: hash}, _data, function(err, activity){
     if(!activity)
       return console.error("No download found");
     console.log("update download");
