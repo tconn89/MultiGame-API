@@ -89,7 +89,7 @@ configuredForm = function(req,res, binaryFlag){
           console.log("Added download activity" + hash.substring(0, 6));
           return res.send(hash);
         });
-      else if(Math.round(100* bytesReceived / bytesExpected) % 10 == 0 ){
+      else if(Math.round(10000* bytesReceived / bytesExpected) % 1000 == 0 ){
         console.log(mapController.activeHash);
         UpdateDownload(mapController.activeHash, bytesReceived);
       }
