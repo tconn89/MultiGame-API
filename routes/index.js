@@ -93,6 +93,8 @@
     ActiveDownload.findOne({user_id: req.headers.id, created_at: {$gte: _time}}, function(err, activity){
       if(err)
         console.error(err);
+      if(!activity)
+        res.send({percentile: 1, current_bytes: 1, expected_bytes: 1});
       else{
         received = activity.current_bytes;
         expected = activity.expected_bytes;
