@@ -48,7 +48,9 @@
 
   BinaryFile.statics.customRemove = function(m_map_name, cb){
     self = this;
+    console.log("map name: " + m_map_name);
     self.findOne({map_name: m_map_name}, function(err, map){
+      console.log("map: " + map);
       if(map){
         _map_path = map.path
         map.remove(function(err){

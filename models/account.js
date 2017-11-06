@@ -20,8 +20,26 @@
     password: String,
     created_at: Date,
     resetPasswordToken: String,
-    resetPasswordExpiration: Date
+    resetPasswordExpiration: Date,
+    roles: [String]
   });
+
+  Account.methods.setRoles = function(roles, cb){
+    self = this;
+    if(self.roles == null){
+        self.roles = [];
+      roles.forEach(function(role){
+        console.log(role);
+        self.roles.push(role);
+      })
+    }
+    else
+      self.roles = roles;
+    self.save(function(err){
+      if(err) console.error(err);
+      return cb(`roles for ${self.username} were updated`);
+    })
+  };
   Account.plugin(autoIncrement.plugin, { model: 'accounts', field: 'id' });
   Account.plugin(passportLocalMongoose);
 

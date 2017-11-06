@@ -32,6 +32,7 @@
 
   PermissionController = require('../controllers/permissions_controller');
   permissionController = new PermissionController();
+  roles = require('../middleware/roles')
 
 
   var Schema   = mongoose.Schema;
@@ -48,6 +49,7 @@
 
   // Verify the user is signed in
   router.get('/', function(req, res) {
+    console.log("user role is: " + req.user.roles[0]);
     res.type('text/plain').send(`${req.user.username} just started a new session`);
   });
 
@@ -55,6 +57,14 @@
   router.get('/register', function(req, res) {
     return res.render('register', {});
   });
+
+  router.post('/admin/roles/update', function(req, res){
+    roles = req.body.roles;
+    req.user.setRoles(roles, function(message){
+      res.send(message);
+    });
+  });
+
 
   router.post('/guest/save', function(req, res){
     req.query.guest = true;
@@ -105,7 +115,7 @@
       }
     })
   });
-  router.post('/admin/remove', function(req, res){
+  router.post('/admin/remove', roles.check('delete', 'binary_file'), function(req, res){
     BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
       res.status(m_status).send({message: m_message});
     })
@@ -224,6 +234,7 @@
   router.post('/login', passport.authenticate('local', {
     failureFlash: true
   }), function(req, res, next) {
+    console.log('req is authenticated: ' + req.isAuthenticated());
     if(req.user.emailPending)
       return res.status(400).send('User has not verified their email address');
     Session.findOne({user_id: req.user.id}, function(err, session){
