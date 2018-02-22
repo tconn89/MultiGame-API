@@ -19,15 +19,20 @@
 
   BinaryFile = require('../models/binary_file');
 
+  ActiveDownload = require('../models/active_download');
+
   Session = require('../models/session');
 
   mongoose = require('mongoose');
 
   MapController = require('../controllers/map_controller');
   mapController = new MapController();
+  UserController = require('../controllers/user_controller');
+  userController = new userController();
 
   PermissionController = require('../controllers/permissions_controller');
   permissionController = new PermissionController();
+
 
   var Schema   = mongoose.Schema;
   var ObjectIdSchema = Schema.ObjectId;
@@ -41,80 +46,21 @@
 
   router = express.Router();
 
+  // Verify the user is signed in
   router.get('/', function(req, res) {
     res.type('text/plain').send(`${req.user.username} just started a new session`);
   });
 
+  // Render a registration page
   router.get('/register', function(req, res) {
     return res.render('register', {});
   });
 
-  getIncrementedId = function(){
-    return Account.findOne().sort({created_at: -1}).exec(function(err, account) {
-      if(err){
-        console.log(err);
-        return 1;
-      }
-      if(account){
-        if(account.id)
-          return 1 + account.id;
-      }
-      else
-        return 1;
-    });
-  }
-  router.get('/drop', function(req,res){
-    mongoose.connection.db.dropCollection('accounts', function(err, result) {
-      if(err)
-        return console.log(err);
-      res.send('deleted');
-    });
-
+  router.post('/guest/save', function(req, res){
+    req.query.guest = true;
+    mapController.upload(req, res);    
   });
-
-  function dropCollection (modelName) {
-    if (!modelName || !modelName.length) {
-      Promise.reject(new Error('You must provide the name of a model.'));
-    }
-
-    try {
-      var model = mongoose.model(modelName);
-      var collection = mongoose.connection.collections[model.collection.collectionName];
-    } catch (err) {
-      return Promise.reject(err);
-    }
-
-    return new Promise(function (resolve, reject) {
-      collection.drop(function (err) {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        // Remove mongoose's internal records of this
-        // temp. model and the schema associated with it
-        delete mongoose.models[modelName];
-        delete mongoose.modelSchemas[modelName];
-
-        resolve();
-      });
-    });
-  }
-  router.get('/real_drop', function(req,res){
-    dropCollection('accounts');
-    res.send('good to go');
-  });
-
-  router.get("/session", function(req, res){
-    session = req.session;
-    console.log(`Session Store: ${req.session.store}`);
-    console.log(`Cookie: ${Session.cookie}`);
-
-    session.store.get(req.sessionID, function(err, data) {
-      res.send({err: err, data:data});
-    });
-  });
-
+  // Change the permission level to Public, Protected, or Private
   router.post('/map_permission_level', function(req, res){
     permissionController.update(req, res, "", function(myRes){
       if(myRes.status == 200){
@@ -129,6 +75,56 @@
     });
 
   });
+  // Temporary endpoint until we have roles
+  router.get('/users', function(req,res){
+    Account.find({}, function(err, users){
+      if(err)
+        console.error(err);
+      result = '';
+      users.forEach(function(user){
+        result += user.username + '\n'
+      })
+      res.send(result);
+    });
+  });
+  router.get('/progress', function(req, res){
+    _date = new Date();
+    _time = _date.setSeconds(_date.getSeconds()-7);
+    ActiveDownload.findOne({user_id: req.headers.id, created_at: {$gte: _time}}, function(err, activity){
+      if(err)
+        console.error(err);
+      if(!activity)
+        res.send({percentile: 1, current_bytes: 1, expected_bytes: 1});
+      else{
+        received = activity.current_bytes;
+        expected = activity.expected_bytes;
+        percent = Math.round(100* received / expected)/ 100;
+        res.send({ percentile: percent,
+                   bytesReceived: received,
+                   bytesExpected: expected });
+      }
+    })
+  });
+  router.post('/admin/remove', function(req, res){
+    BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
+      res.status(m_status).send({message: m_message});
+    })
+  });
+
+  router.post('/map/remove', function(req, res){
+    _map_name = req.body.map_name
+    _user = req.user
+    BinaryFile.findOne({map_name: _map_name}, function(err, map){
+      if(map.user_id == _user.id){
+        BinaryFile.customRemove(req.body.map_name, function(m_message, m_status){
+          res.status(m_status).send({message: m_message});
+        })
+      }
+      else
+        res.status(401).send({message: `${_user.username} cannot destroy ${_map_name}; They do not own that map.`})
+    })
+  })
+  // Send user registration credentials to server
   router.post('/register', function(req, res, next) {
     username = req.body.username;
     password = req.body.password;
@@ -139,26 +135,78 @@
       //res.clearCookie('connect.sid');
       return res.status(400).send('missing field data').end();
     }
-      // User by that name already exists
-      // if(user)
-      //   return res.status(400).send(`user by name: ${user.username} already taken`).end();
-
-    return Account.register(new Account({
-      username: username,
-      email: email,
-      created_at: new Date
-    }), req.body.password, function(err, account) {
-      if (err) {
-        return res.status(400).send(err.message);
-      }
-      return passport.authenticate('local')(req, res, function() {
-        req.session.cookie.maxAge = 3600000;
-        // do not duplicate in db sessions
-        // need to be async
-        session = new Session();
-        session.created_at = new Date;
-        session.saveSesh(req.session.id, req.user, res);
+    token = crypto.randomBytes(20).toString('hex');
+    console.log(`token ${token}`);
+    async.waterfall([function(done){
+      // email duplicate check
+      Account.findOne({email: email}, function(err, user){
+        if(err)
+          console.error(err);
+        if(user)
+          return res.status(400).send("User already exists with the email");
+        done('done')
+      })
+    }], function(){
+      Account.register(new Account({
+        username: username,
+        email: email,
+        emailToken: token,
+        emailPending: true,
+        created_at: new Date
+      }), req.body.password, function(err, account) {
+        if (err) {
+          return res.status(400).send(err.message);
+        }
+        return passport.authenticate('local')(req, res, function() {
+          req.session.cookie.maxAge = 3600000;
+          // do not duplicate in db sessions
+          // need to be async
+          session = new Session();
+          session.created_at = new Date;
+          session.saveSesh(req.session.id, req.user, res, function(){
+            userController.sendVerificationMail(req, req.user, function(err){
+              if(err){
+                Account.find({ username:req.user.username }).remove().exec();
+                res.status(400).send(`${req.user.email} is not a valid email address`);
+              }
+              else
+                res.status(200).send(`Email sent to ${req.user.email}, please verify before proceeding`);
+            });
+          });
+        });
       });
+    });
+  });
+
+  // Resend Verification Email
+  router.post('/email/resend', function(req, res){
+    Account.findOne({email: req.body.email}, function(err, user){
+      if(err || user == null)
+        res.status(400).send(`Couldn't find email for user: ${req.body.username}`)
+      else{
+        if(user.emailPending){
+          userController.sendVerificationMail(req, user, function(err){
+            if(err)
+              res.status(400).send(`${user.email} is not a valid email address`);
+            else
+              res.status(200).send(`Email sent to registered email address of ${user.username}`);
+          });
+        } else 
+          res.status(400).send(`${user.username}'s email address has already been verified`);
+      }
+    })
+  });
+
+  // Tell the server you are the authorized user to reset password
+  router.get('/email/:token', function(req, res){
+    Account.findOne({emailToken: req.params.token}, function(err, user){
+      user.emailPending = false;
+      user.emailToken = -1;
+      user.save(function(err){
+        if(err)
+          console.error(err);
+      })
+      return res.status(200).send(`email verified, ${user.username} may login now`);
     });
   });
 
@@ -171,9 +219,13 @@
     });
   });
 
+  // Authenticate the user and return a unique session id
+  // User must have verified email address to login
   router.post('/login', passport.authenticate('local', {
     failureFlash: true
   }), function(req, res, next) {
+    if(req.user.emailPending)
+      return res.status(400).send('User has not verified their email address');
     Session.findOne({user_id: req.user.id}, function(err, session){
       if(err)
         console.error(err);
@@ -184,6 +236,7 @@
     });
   });
 
+  // Expire the user session
   router.get('/logout', function(req, res, next) {
     Session.findOne({user_id: req.user.id }, (err, session) => {
       if(err)
@@ -222,17 +275,16 @@
         res.status('200').end(fs.readFileSync(data.path));
     });
   };
+  // Download a serialized binary file
   router.get('/binary',
     clientBinary
   );
+  router.get('/guest/load',
+    clientBinary
+  );
 
-  router.get('/', function(req, res) {
-    return res.render('index', {
-      user: req.user
-    });
-  });
   // Just an idea, not working
-  router.get('redis', function(req, res){
+  router.get('/redis', function(req, res){
     server.open(function(err){
       if(err == null){
         // do some stuff
@@ -241,6 +293,7 @@
     })
   });
 
+  // Test for returning size of maps in kilobytes
   router.get('/sizes', function(req, res){
     BinaryFile.find({}, function(err, binary_refs){
       if(err){
@@ -261,6 +314,27 @@
   });
 
 
+  router.get('/guest/maps', function(req, res){
+    BinaryFile.find({guest: true}, function(err, docs){
+      if(err){
+        throw err;
+      }
+      names = [];
+      i = 0;
+      docs.forEach(function(ref){
+        if(ref.map_name){
+          if(!ref.map_name.endsWith('Terrain'))
+            names.push(ref.map_name);
+        }
+      });
+      maps = {
+        'maps': names
+      }
+      maps_json = JSON.stringify(maps);
+      res.status(200).send(maps_json).end();
+    });
+  });
+  //  Request a list of all maps by protection level
   router.get('/maps_index', function(req, res){
     permissionLevel = req.query.permission;
     if(!permissionLevel)
@@ -288,48 +362,8 @@
       res.status(200).send(maps_json).end();
     });
   });
-  router.get('/ping', function(req, res) {
-    var file, http, request;
-    console.log(__dirname);
-    BinaryFile.remove(function(err) {
-      var b;
-      if (err) {
-        throw err;
-      }
-      return b = new BinaryFile;
-    });
-    console.log('Starting');
-    http = require('http');
-    file = fs.createWriteStream("./write.jpg");
-    request = http.get("localhost:3000/binary", function(response) {
-      return response.pipe(file);
-    });
-    fs.exists('./sample.jpg', function(fileok) {
-      console.log(fileok);
-      if (fileok) {
-        fs.readFile('./sample.jpg', function(error, data) {
-          var b;
-          b = new BinaryFile;
-          b.binary = data;
-          return b.save;
-        });
-      } else {
-        console.log('file not found');
-      }
-    });
-    console.log('Carry on executing');
-    return res.status(200).send('finished');
-  });
 
-  router.get('/remove_binary', function(req, res){
-    BinaryFile.remove({}, function(err){
-      if(err){
-        console.error(err);
-      }
-      res.status(200).send('All removed');
-    });
-  });
-
+  // Upload a binary file with a specified mapname
   router.post('/upload', function(req, res){
     mapController.upload(req, res);
   });
@@ -370,7 +404,7 @@
       function(token, user, done) {
         var mailOptions = {
           to: user.email,
-          from: 'passwordreset@demo.com',
+          from: 'passwordreset@terrium.net',
           subject: 'Node.js Password Reset',
           text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -394,7 +428,7 @@
     });
   });
 
-  // login user and
+  // login user and display new password form
   router.get('/reset/:token', function(req, res) {
     Account.findOne({ resetPasswordToken: req.params.token, resetPasswordExpiration: { $gt: Date.now() } }, function(err, user) {
       if (!user) {
@@ -410,6 +444,7 @@
     });
   });
 
+  // Post a new password
   router.post('/reset/:token', function(req, res) {
     async.waterfall([
       function(done) {
@@ -432,7 +467,7 @@
       function(user, done) {
         var mailOptions = {
           to: user.email,
-          from: 'passwordreset@terrium.com',
+          from: 'passwordreset@terrium.net',
           subject: 'Your password has been changed',
           text: 'Hello,\n\n' +
             'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'

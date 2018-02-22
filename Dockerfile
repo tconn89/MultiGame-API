@@ -77,10 +77,10 @@ VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh # backwards compat
-ENTRYPOINT ["docker-entrypoint.sh"]
+# ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
-CMD ["mongod"]
+# CMD ["mongod --config /var/www/node_server/mongo.conf"]
 
 # Install app dependencies
 COPY package.json /var/www/node_server
@@ -92,7 +92,7 @@ COPY . /var/www/node_server
 
 EXPOSE 3000
 RUN mkdir /var/www/node_server/log
-RUN FOREVER_ROOT="/var/www/node_server" forever start
+# RUN FOREVER_ROOT="/var/www/node_server" forever start bin/server.js
 
 # CMD ["bin/bash"]
 # CMD [ "npm", "run-script", "mongo_start" ]

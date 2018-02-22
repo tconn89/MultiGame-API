@@ -1,7 +1,7 @@
 {
-  "root": "./",
-  "pidPath": "pids",
-  "sockPath": "sock",
+  "root": "/var/www/node_server",
+  "pidPath": "/var/www/node_server/pids",
+  "sockPath": "/var/www/node_server/sock",
   "logFile": "/var/www/node_server/log/dev.log",
   "watch": true,
   "loglength": 100,

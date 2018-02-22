@@ -6,6 +6,10 @@ path = require('path');
 
 permissionController = function(){};
 
+// params
+// req, res
+// opts: optional suffix on map name
+// cb:   function callback after update finishes
 permissionController.prototype.update = function(req, res, opts, cb){
   permission = req.query.permission;
   map_name = req.query.map_name;

@@ -14,6 +14,8 @@
 
   Account = new Schema({
     email: String,
+    emailToken: String,
+    emailPending: Boolean,
     username: String,
     password: String,
     created_at: Date,

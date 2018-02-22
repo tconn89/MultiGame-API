@@ -2,10 +2,12 @@
 /logs
 /log
 /tmp
+/pids
 .DS_Store
 .idea/
 .sass-cache
 node_modules
 *.out
 npm-debug.log
-public/uploads
+public/uploads/
+sslcert/
