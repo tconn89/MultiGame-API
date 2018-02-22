@@ -373,8 +373,8 @@
   var mg = require('nodemailer-mailgun-transport')
   var auth = {
     auth: {
-      api_key: 'key-ac5c436f177ccbc638224cb577553aae',
-      domain: 'api.terrium.net'
+      api_key: process.env.MAILGUN_KEY,
+      domain: process.env.SITE
     }
   }
 
