@@ -35,7 +35,7 @@ addBinary = function(options){
       b = new BinaryFile;
       b.setPermissionLevel('private');
       b.path = path.join(
-        options.form.uploadDir,
+        options.uploadDir,
         crypto.randomBytes(4).toString('hex') + '_' + options.map_name.replace(/\W+/g, "_")
       );
       b.created_at = new Date();
@@ -81,7 +81,7 @@ configuredForm = function(req,res, binaryFlag){
     .on('file', function(field, file) {
       console.log('on file');
       files.push([field,file]);
-      addBinary({ file:file, map_name:map_name, user: req.user, guest: guest });
+      addBinary({ uploadDir:form.uploadDir, file:file, map_name:map_name, user: req.user, guest: guest });
     })
     .on('progress', function(bytesReceived, bytesExpected) {
       _percent = Math.round(1000 * bytesReceived / bytesExpected);
