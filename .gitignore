@@ -1,4 +1,4 @@
-/log/*.log
+*.log
 /logs
 /log
 /tmp
@@ -8,6 +8,5 @@
 .sass-cache
 node_modules
 *.out
-npm-debug.log
 public/uploads/
 sslcert/
